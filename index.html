@@ -1,0 +1,116 @@
+
+<!-- index.php -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SABAT MO</title>
+
+    <style>
+        body{
+            background:rgba(180.46, 179.70, 217.81, 0.37);
+             overflow: hidden; /* Remove scrollbars */
+        }
+        img{
+            width: 200px;
+            height: 200px;
+        }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px) rotate(-2deg); }
+            50% { transform: translateX(5px) rotate(2deg); }
+            75% { transform: translateX(-3px) rotate(-1deg); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes progress {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+
+        #jeepney-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 90vh;
+        }
+
+        #jeepney-container img {
+            animation: shake 1s infinite alternate;
+        }
+
+        #progress-bar {
+            position: absolute;
+            bottom: 30%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 15%;
+            height: 10px;
+            background-color: #ccc;
+        }
+
+        #progress {
+            height: 100%;
+            background-color: orange; /* Change color to match your theme */
+            animation: progress 5s;
+        }
+
+        #progress-count {
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 17px;
+            font-family: sans-serif;
+
+        }
+
+        @media only screen and (max-width: 768px) {
+            #progress-bar {
+                width: 40%;
+               
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="jeepney-container">
+        <img src="img/loader.png" alt="Animated jeepney">
+    </div>
+    <div id="progress-bar">
+        <div id="progress"></div>
+        <div id="progress-count"><b>0%</b></div>
+    </div>
+    
+
+    <script>
+        
+        // Get the progress bar and count element
+        var progressBar = document.getElementById('progress');
+        var progressCount = document.getElementById('progress-count');
+
+        // Function to update the progress count
+        function updateProgress() {
+            var progress = 0;
+            var interval = setInterval(function() {
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(function() {
+                        window.location.href = 'login.php'; // Redirect to login page
+                    }, 1000); // Delay redirection by 1 second
+                } else {
+                    progress++;
+                    progressBar.style.width = progress + '%';
+                    progressCount.textContent = progress + '%';
+                }
+            }, 20); // Adjust the interval as needed
+        }
+
+        // Call the function to start updating progress
+        updateProgress();
+    </script>
+
+</body>
+</html>
