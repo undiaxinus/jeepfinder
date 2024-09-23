@@ -82,6 +82,11 @@ if (!$row) {
   box-sizing: border-box;
   font-family: "Poppins" , sans-serif;
 }
+body{
+   background: #7F7FD5;
+         background: -webkit-linear-gradient(to right, #91EAE4, #86A8E7, #7F7FD5);
+          background: linear-gradient(to right, #91EAE4, #86A8E7, #7F7FD5);
+}
 .sidebar{
   position: fixed;
   left: 0;
@@ -301,7 +306,7 @@ if (!$row) {
 }
 .home-section{
   position: relative;
-  background: linear-gradient(90deg, rgba(0, 239.70, 255, 0.50) 0%, rgba(174.08, 2.13, 255, 0.50) 100%);
+  
   min-height: 100vh;
   top: 0;
   left: 78px;
@@ -348,16 +353,17 @@ i{
 }
 
 
+
 @media (max-width: 768px) {
   .links_name{
     display: none;
   }
   .sidebar {
-    position: fixed; /* Position fixed to stick it to the bottom */
-    bottom: 0; /* Stick the sidebar to the bottom */
+    position: fixed; 
+    bottom: 0; 
     left: 0;
-    width: 100%; /* Full width */
-    height: 70px; /* Adjust height as needed */
+    width: 100%; 
+    height: 45px; 
     background: #11101D;
     display: flex;
     justify-content: space-between;
@@ -366,15 +372,16 @@ i{
     z-index: 99;
   }
 
+
   .sidebar .logo-details {
-    display: none; /* Hide logo for mobile */
+    display: none; 
   }
 
   .sidebar .nav-list {
     display: flex;
     justify-content: space-around;
     width: 100%;
-
+    margin-bottom: 0px;
   }
 
   .sidebar li {
@@ -389,15 +396,20 @@ i{
     color: #fff;
     font-size: 14px;
     transition: all 0.3s ease;
+    height: 30px;
+    margin-top: -7px;
   }
 
   .sidebar li a:hover {
-    color: #FFF;
+    color: #fff;
   }
 
   .sidebar li i {
     font-size: 24px;
+    line-height: 20px;
+
   }
+
 
   .sidebar .profile {
     display: flex;

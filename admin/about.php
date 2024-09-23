@@ -18,17 +18,17 @@ if($_SESSION['Role'] != 'admin'){
             justify-content: center;
             align-items: center;
             min-height: 100vh; /* This ensures the section takes up the full viewport height */
-            background-color: #e0e0e0;
+           
         }
-        
+      
         .container {
-            background-color: #f0f0f0;
+            background-color: rgba(0,0,0,0.4) !important;
             padding: 20px;
             border-radius: 10px;
             max-width: 800px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 90%;
-            margin-bottom: 40px;
+            margin-bottom: 50px;
         }
         .title {
             color: #ff0000;
