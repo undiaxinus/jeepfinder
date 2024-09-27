@@ -34,9 +34,13 @@ if (isset($_POST['submit'])) {
     $email = $_POST['email'];
     $user = $_POST['user'];
     $account = $_POST['account'];
-    $password = $_POST['password'];
-    $hashedPassword = hash('sha256', $password);
 
+    if (!empty($_POST['password'])) {
+        $password = $_POST['password'];
+        $hashedPassword = hash('sha256', $password); 
+    } else {
+        $hashedPassword = $userData['password'];
+    }
     $updateQuery = "UPDATE `user` SET 
         `fname`='$fname', 
         `mname`='$mname', 
@@ -155,8 +159,9 @@ if (isset($_POST['submit'])) {
                 </div>
                 <div class="form-group">
                     <label class="form-label">Password</label>
-                    <input type="text" name="password" value="<?php echo $userData['password']; ?>" required="required" class="form-control"/>
+                    <input type="password" name="password" placeholder="Leave blank to keep current password" class="form-control"/>
                 </div>
+
 
                 <div class="form-group">
                     <label class="form-label">Role</label>
