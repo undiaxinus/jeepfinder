@@ -1,10 +1,6 @@
 <?php
-// navigation.php
 include '../connection/conn.php';
-
-// Check if 'id' parameter is set
 $id = isset($_GET['id']) ? $_GET['id'] : '';
-
 if ($id === '') {
     echo '<script>
             Swal.fire({
@@ -17,15 +13,11 @@ if ($id === '') {
                 window.location.href = "logout1.php";
             });
          </script>';
-    exit; // Exit to prevent further execution of the page
+    exit;
 }
-
-// Fetch student information
 $sql = "SELECT * FROM user WHERE user = ?";
 $stmt = $conn->prepare($sql);
-
 if ($stmt === false) {
-    // Handle statement preparation error
     echo '<script>
             Swal.fire({
                 icon: "error",
@@ -39,14 +31,11 @@ if ($stmt === false) {
          </script>';
     exit;
 }
-
 $stmt->bind_param("s", $id);
 $stmt->execute();
 $result = $stmt->get_result();
 $row = $result->fetch_assoc();
-
 $stmt->close();
-
 if (!$row) {
     echo '<script>
             Swal.fire({
@@ -59,24 +48,19 @@ if (!$row) {
                 window.location.href = "logout1.php";
             });
          </script>';
-    exit; // Exit to prevent further execution of the page
+    exit;
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8">
     <title>SABAT MO!</title>
-    
-    <!-- Boxicons CDN Link -->
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-
    </head>
    <style type="text/css">
-     /* Google Font Link */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
 *{
   margin: 0;
@@ -85,14 +69,13 @@ if (!$row) {
   font-family: "Poppins" , sans-serif;
 }
 body{
-   background: #7F7FD5;
-         background: -webkit-linear-gradient(to right, #91EAE4, #86A8E7, #7F7FD5);
-          background: linear-gradient(to right, #91EAE4, #86A8E7, #7F7FD5);
+    background: #7F7FD5;
+    background: -webkit-linear-gradient(to right, #91EAE4, #86A8E7, #7F7FD5);
+    background: linear-gradient(to right, #91EAE4, #86A8E7, #7F7FD5);
 }
 .sidebar{
   position: fixed;
   left: 0;
-  
   height: 100%;
   width: 78px;
   background: #11101D;
@@ -353,9 +336,6 @@ body{
 i{
   padding-top: 0px;
 }
-
-
-
 @media (max-width: 768px) {
   .links_name{
     display: none;
@@ -373,25 +353,20 @@ i{
     padding: 0 20px;
     z-index: 99;
   }
-
-
   .sidebar .logo-details {
     display: none; 
   }
-
   .sidebar .nav-list {
     display: flex;
     justify-content: space-around;
     width: 100%;
     margin-bottom: 0px;
   }
-
   .sidebar li {
     list-style: none;
     text-align: center;
     padding: 5px;
   }
-
   .sidebar li a {
     display: block;
     text-decoration: none;
@@ -401,25 +376,20 @@ i{
     height: 30px;
     margin-top: -7px;
   }
-
   .sidebar li a:hover {
     color: #fff;
   }
-
   .sidebar li i {
     font-size: 24px;
     line-height: 20px;
 
   }
-
-
   .sidebar .profile {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
   }
-
   .sidebar .profile #log_out {
     display: block;
     font-size: 18px;
@@ -427,7 +397,6 @@ i{
     text-decoration: none;
     transition: all 0.3s ease;
   }
-
   .sidebar .profile #log_out:hover {
     color: #FFF;
   }
@@ -435,7 +404,6 @@ i{
     padding-top: 5px;
   }
 }
-
    </style>
 <body>
   <div class="sidebar">
@@ -495,13 +463,11 @@ i{
     sidebar.classList.toggle("open");
     menuBtnChange(); 
   });
-
-  // following are the code to change sidebar button(optional)
   function menuBtnChange() {
    if(sidebar.classList.contains("open")){
-     closeBtn.classList.replace("bx-menu", "bx-menu-alt-right");//replacing the iocns class
+     closeBtn.classList.replace("bx-menu", "bx-menu-alt-right");
    }else {
-     closeBtn.classList.replace("bx-menu-alt-right","bx-menu");//replacing the iocns class
+     closeBtn.classList.replace("bx-menu-alt-right","bx-menu");
    }
   }
   </script>
@@ -510,6 +476,5 @@ i{
         event.preventDefault();
     });
 </script>
-
 </body>
 </html>

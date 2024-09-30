@@ -17,10 +17,9 @@ if($_SESSION['Role'] != 'user'){
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh; /* This ensures the section takes up the full viewport height */
+            min-height: 100vh;
            
         }
-      
         .container {
             background-color: rgba(0,0,0,0.4) !important;
             padding: 20px;
@@ -69,8 +68,8 @@ if($_SESSION['Role'] != 'user'){
         }
         .footer {
             margin-top: 20px;
-            background-color: #333; /* Dark background color for the footer */
-            color: #fff; /* White text color for the footer */
+            background-color: #333; 
+            color: #fff;
             padding: 10px;
             border-radius: 0 0 10px 10px;
             display: flex;
@@ -180,7 +179,6 @@ if($_SESSION['Role'] != 'user'){
                 </div>
             </div>
         </div>
-
     </section>
 </body>
 </html>

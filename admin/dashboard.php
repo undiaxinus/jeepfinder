@@ -215,7 +215,7 @@ $conn->close();
                 border: 1px solid #ddd;
                 border-radius: 5px;
                 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                top: -120px;
+                top: -80px;
                 right: 40px;
                 z-index: 1000;
             }
@@ -376,7 +376,6 @@ $conn->close();
                     <ul>
                         <li><a href='Add_Account.php?id=<?php echo $id ?>' style="color:black;"> Add Account</a></li>
                         <li><a href='Add_Jeepney.php?id=<?php echo $id ?>' style="color:black;">Add Jeepney</a></li>
-                        <li><a href='Add_Emergency_Contact.php?id=<?php echo $id ?>' style="color:black;">Add Emergency Contact</a></li>
                     </ul>
                 </details>
             </div>

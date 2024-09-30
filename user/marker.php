@@ -1,10 +1,7 @@
 <?php
-// marker.php
 include("../connection/conn.php");
-
 $sql = "SELECT * FROM locate";
 $result = $conn->query($sql);
-
 if ($result->num_rows > 0) {
     $data = array();
     while ($row = $result->fetch_assoc()) {
@@ -20,11 +17,9 @@ if ($result->num_rows > 0) {
             'jeep' => $row['jeepicon']
         );
     }
-
     echo json_encode($data);
 } else {
     echo json_encode(array('error' => 'No data found'));
 }
-
 $conn->close();
 ?>
