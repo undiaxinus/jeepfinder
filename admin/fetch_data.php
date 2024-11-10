@@ -1,5 +1,5 @@
 <tr>
-    <th>ID</th>
+    <!--<th>ID</th>-->
     <th>Drivers Information</th>
     <th>Jeepney data information</th>
     <th>Status</th>
@@ -13,8 +13,9 @@
     $sql = "SELECT * FROM `locate`";
     $result = $conn->query($sql);
     while ($row = $result->fetch_assoc()) {
+        $hashedPassword = hash('sha256', $row['ID']);
         echo "<tr>
-            <td>{$row['ID']}</td>
+            <!--<td>{$hashedPassword}</td>-->
             <td><strong>Drivers name: </strong>{$row['drivername']}<br>
             <strong>Address: </strong>{$row['address']}<br>
             <strong>Company name: </strong>{$row['company_name']}<br>

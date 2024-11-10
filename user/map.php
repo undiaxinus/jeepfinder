@@ -68,111 +68,129 @@ header('Location: ../index.html?error=Access denied');
     <div id="map" style="height: 100vh;"></div>
 </section>
 <script>
-    var map = L.map('map', { zoomControl: false, minZoom: 10 });
-    var routePolyline = L.polyline([], {
-        color: 'red',
-        dashArray: '10 5'
-    }).addTo(map);
-    var userMarker;
-    function updateDirectionLine() {
-        if (userMarker && routePolyline) {
-            var userLocation = userMarker.getLatLng();
-            var destination = routePolyline.getLatLngs()[0];
-            var lineCoordinates = [userLocation, destination];
-            routePolyline.setLatLngs(lineCoordinates);
-        }
+    // Initialize the map
+var map = L.map('map', { zoomControl: false, minZoom: 10 });
+var routePolyline = L.polyline([], {
+    color: 'red',
+    dashArray: '10 5'
+}).addTo(map);
+var userMarker;
+
+function updateDirectionLine() {
+    if (userMarker && routePolyline) {
+        var userLocation = userMarker.getLatLng();
+        var destination = routePolyline.getLatLngs()[0];
+        var lineCoordinates = [userLocation, destination];
+        routePolyline.setLatLngs(lineCoordinates);
     }
-    function updateUserLocation(destination) {
-        if (navigator.geolocation) {
-            navigator.geolocation.watchPosition(function (position) {
-                var userLocation = [position.coords.latitude, position.coords.longitude];
-                if (!userMarker) {
-    var customIconSvg = `
-        <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="20" cy="20" r="18" fill="rgba(0, 0, 255, 0.3)" />
-            <circle cx="20" cy="20" r="7" fill="orange" />
-        </svg>
-    `;
-    var customIconUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(customIconSvg);
-    var customIcon = L.icon({
-        iconUrl: customIconUrl,
-        iconSize: [40, 40],
-        iconAnchor: [20, 20], 
-    });
-    userMarker = L.marker(userLocation, {
-        icon: customIcon,
-        draggable: true
-    }).addTo(map);
-    userMarker.bindPopup("<b>Your Location</b>").openPopup();
-    userMarker.on('dragend', function (event) {
-        var updatedDestination = event.target.getLatLng();
-        updateRoute(updatedDestination);
-        updateUserLocation(updatedDestination);
-    });
-} else {
-    userMarker.setLatLng(userLocation);
 }
-routePolyline.addLatLng(userLocation);
-var distanceToDestination = userMarker.getLatLng().distanceTo(destination);
-if (distanceToDestination < 10) {
-    Swal.fire({
-        title: 'Destination Reached!',
-        text: 'You have reached your destination!',
-        icon: 'success',
-        confirmButtonText: 'Okay'
-    });
-}
-                updateRoute(destination);
-                updateDirectionLine();
-            }, function (error) {
-                console.error('Error getting user location:', error.message);
-            }, { enableHighAccuracy: true });
-        } else {
-            console.error('Geolocation is not supported by this browser.');
-        }
-    }
-    updateUserLocation();
-    updateDirectionLine();
+
+function updateUserLocation(destination) {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            var latitude = position.coords.latitude;
-            var longitude = position.coords.longitude;
-            map.setView([latitude, longitude], 17);
-        }, function(error) {
-            console.error('Error getting user location:', error);
-            map.setView([13.16472023105074, 123.75132122380849], 17);
-        });
+        navigator.geolocation.watchPosition(function (position) {
+            var userLocation = [position.coords.latitude, position.coords.longitude];
+            if (!userMarker) {
+                var customIconSvg = `
+                    <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="20" cy="20" r="18" fill="rgba(0, 0, 255, 0.3)" />
+                        <circle cx="20" cy="20" r="7" fill="orange" />
+                    </svg>
+                `;
+                var customIconUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(customIconSvg);
+                var customIcon = L.icon({
+                    iconUrl: customIconUrl,
+                    iconSize: [40, 40],
+                    iconAnchor: [20, 20],
+                });
+                userMarker = L.marker(userLocation, {
+                    icon: customIcon,
+                    draggable: true
+                }).addTo(map);
+                userMarker.bindPopup("<b>Your Location</b>").openPopup();
+                userMarker.on('dragend', function (event) {
+                    var updatedDestination = event.target.getLatLng();
+                    updateRoute(updatedDestination);
+                    updateUserLocation(updatedDestination);
+                });
+            } else {
+                userMarker.setLatLng(userLocation);
+            }
+            routePolyline.addLatLng(userLocation);
+            var distanceToDestination = userMarker.getLatLng().distanceTo(destination);
+            if (distanceToDestination < 10) {
+                Swal.fire({
+                    title: 'Destination Reached!',
+                    text: 'You have reached your destination!',
+                    icon: 'success',
+                    confirmButtonText: 'Okay'
+                });
+            }
+            updateRoute(destination);
+            updateDirectionLine();
+        }, function (error) {
+            console.error('Error getting user location:', error.message);
+        }, { enableHighAccuracy: true });
     } else {
         console.error('Geolocation is not supported by this browser.');
-        map.setView([13.16472023105074, 123.75132122380849], 17);
     }
-    var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        minZoom: 0,
-        maxZoom: 20,
-        attribution: ''
+}
+
+// Get the current location
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function (position) {
+        var latitude = position.coords.latitude;
+        var longitude = position.coords.longitude;
+        map.setView([latitude, longitude], 17);
+        updateUserLocation(); // Start tracking user location
+    }, function (error) {
+        console.error('Error getting user location:', error);
+        map.setView([13.16472023105074, 123.75132122380849], 17); // Default location
     });
-    var stadiaLayer = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.{ext}', {
-        minZoom: 0,
-        maxZoom: 20,
-        attribution: '',
-        ext: 'jpg'
-    });
-    var MtbMap = L.tileLayer('http://tile.mtbmap.cz/mtbmap_tiles/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &amp; USGS'
+} else {
+    console.error('Geolocation is not supported by this browser.');
+    map.setView([13.16472023105074, 123.75132122380849], 17); // Default location
+}
+
+// Define tile layers
+var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    minZoom: 0,
+    maxZoom: 20,
+    attribution: ''
 });
-    osmLayer.addTo(map);
-    var Stadia_AlidadeSmoothDark = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.{ext}', {
+var stadiaLayer = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.{ext}', {
+    minZoom: 0,
+    maxZoom: 20,
+    attribution: '',
+    ext: 'jpg'
+});
+var Stadia_AlidadeSmoothDark = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.{ext}', {
     minZoom: 0,
     maxZoom: 20,
     attribution: '',
     ext: 'png'
 });
+
+// Set base layers
 var baseLayers = {
     "Basic View": osmLayer,
     "Satellite View": stadiaLayer,
     "Dark View": Stadia_AlidadeSmoothDark,
-    
 };
+
+// Load the last selected layer from localStorage
+var lastLayer = localStorage.getItem('lastLayer');
+if (lastLayer && baseLayers[lastLayer]) {
+    baseLayers[lastLayer].addTo(map);
+} else {
+    osmLayer.addTo(map); // Default layer
+}
+
+
+// Save the selected layer to localStorage
+map.on('baselayerchange', function (eventLayer) {
+    localStorage.setItem('lastLayer', eventLayer.name);
+});
+
     L.control.layers(baseLayers).addTo(map);
     var doubleClickTimer;
     var isDoubleClick = false;
@@ -271,9 +289,25 @@ function updateRealTimeData() {
                     map.removeLayer(layer);
                 }
             });
-            if (userMarker) {
-                userMarker.addTo(map);
+
+            // Attempt to retrieve the last known location from local storage
+            const cachedLocation = JSON.parse(localStorage.getItem('lastLocation'));
+            if (cachedLocation) {
+                userMarker = L.marker(cachedLocation, {
+                    icon: L.divIcon({
+                        className: 'user-marker',
+                        html: `
+                            <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="20" cy="20" r="18" fill="rgba(0, 0, 255, 0.3)" />
+                        <circle cx="20" cy="20" r="5" fill="blue" /> <!-- Solid dot in the center -->
+                    </svg>
+                        `,
+                        iconSize: [40, 40],
+                        iconAnchor: [20, 40]
+                    })
+                }).addTo(map);
             }
+
             for (var i = 0; i < data.length; i++) {
                 var id = data[i].id;
                 var plateNumber = data[i].plateNumber;
@@ -284,26 +318,48 @@ function updateRealTimeData() {
                 var passengerCount = data[i].passenger;
                 var rotate = data[i].rotation;
                 var jeep = data[i].jeep;
-console.log('Processing data for ID ' + id + ':', latitude, longitude);
-var location = [latitude, longitude];
-var markerIcon = L.divIcon({
-    className: 'custom-icon',
-    html: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><image href="../img/${jeep}" width="32" height="32" transform="rotate(${rotate} 16 16)"/></svg>`,
-    iconAnchor: [16, 32],
-    popupAnchor: [0, -32]
-});
-var marker = L.marker(location, {
-    icon: markerIcon,
-    plateNumber: plateNumber,
-    route: route,
-    passengerCount: passengerCount
-}).addTo(map);
-                var distanceToUser = calculateDistance(latitude, longitude, userMarker.getLatLng().lat, userMarker.getLatLng().lng);
+
+                console.log('Processing data for ID ' + id + ':', latitude, longitude);
+                var location = [latitude, longitude];
+
+                // Original SVG marker for real-time data
+                var markerIcon = L.divIcon({
+                    className: 'custom-icon',
+                    html: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><image href="../img/${jeep}" width="32" height="32" transform="rotate(${rotate} 16 16)"/></svg>`,
+                    iconAnchor: [16, 32],
+                    popupAnchor: [0, -32]
+                });
+
+                var marker = L.marker(location, {
+                    icon: markerIcon,
+                    plateNumber: plateNumber,
+                    route: route,
+                    passengerCount: passengerCount
+                }).addTo(map);
+
+                // Use the user's last known location if location services are off
+                var userLat, userLng;
+                if (cachedLocation) {
+                    userLat = cachedLocation[0];
+                    userLng = cachedLocation[1];
+                } else if (userMarker) {
+                    userLat = userMarker.getLatLng().lat;
+                    userLng = userMarker.getLatLng().lng;
+                } else {
+                    // Skip calculations if no user location is available
+                    continue;
+                }
+
+                
+                var distanceToUser = calculateDistance(latitude, longitude, userLat, userLng);
                 var { hours, minutes } = calculateETAWithSpeed(distanceToUser, speed);
+                
                 marker.bindPopup("<b>Plate#: " + plateNumber + "</b><br>Route: " + route + "<br>Passenger: " + passengerCount + "/25" + "<br>Distance to User: " + distanceToUser.toFixed(2) + " km" + "<br>Speed: " + speed + " km/h" + "<br>ETA: " + hours + " hours " + minutes + " minutes", { autoClose: false });
+
                 if (currentPlateNumber === plateNumber) {
                     marker.fireEvent('click');
                 }
+                
                 marker.on('click', function(e) {
                     map.eachLayer(function(layer) {
                         if (layer instanceof L.Polyline) {
@@ -311,9 +367,10 @@ var marker = L.marker(location, {
                         }
                     });
                     currentPlateNumber = e.target.options.plateNumber;
-                    var distanceToUser = calculateDistance(e.target.getLatLng().lat, e.target.getLatLng().lng, userMarker.getLatLng().lat, userMarker.getLatLng().lng);
+                    var distanceToUser = calculateDistance(e.target.getLatLng().lat, e.target.getLatLng().lng, userLat, userLng);
                     var { hours, minutes } = calculateETAWithSpeed(distanceToUser, speed);
                     e.target.setPopupContent("<b>Plate#: " + currentPlateNumber + "</b><br>Route: " + e.target.options.route + "<br>Passenger: " + e.target.options.passengerCount + "/25" + "<br>Distance to User: " + distanceToUser.toFixed(2) + " km" + "<br>Speed: " + speed + " km/h" + "<br>ETA: " + hours + " hours " + minutes + " minutes");
+                    
                     calculateRouteToUser(e.target.getLatLng())
                         .then(route => {
                             if (route) {
@@ -327,12 +384,45 @@ var marker = L.marker(location, {
                     e.target.openPopup();
                 });
             }
+
+            // Cache the user's current location when successfully retrieved
+            navigator.geolocation.getCurrentPosition(function(position) {
+                const currentLocation = [position.coords.latitude, position.coords.longitude];
+                localStorage.setItem('lastLocation', JSON.stringify(currentLocation)); // Cache current location
+                if (userMarker) {
+                    userMarker.setLatLng(currentLocation); // Update userMarker position if it exists
+                } else {
+                    userMarker = L.marker(currentLocation, {
+                        icon: L.divIcon({
+                            className: 'user-marker',
+                            html: `
+                                <div style="position: relative; display: flex; justify-content: center; align-items: center;">
+                                    <div style="background: radial-gradient(circle, rgba(0, 0, 255, 0.2) 0%, rgba(0, 0, 255, 0.1) 70%); 
+                                                border: 2px solid blue; 
+                                                border-radius: 50%; 
+                                                width: 40px; 
+                                                height: 40px; 
+                                                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);">
+                                    </div>
+                                    <div style="background: blue; border-radius: 50%; width: 15px; height: 15px; position: absolute;"></div>
+                                </div>
+                            `,
+                            iconSize: [40, 40],
+                            iconAnchor: [20, 40]
+                        })
+                    }).addTo(map); // Add marker if it doesn't exist
+                }
+                // Do not set the map view to the user's location
+            }, function() {
+                console.warn('Unable to retrieve location; using cached location if available.');
+            });
         },
         error: function(xhr, status, error) {
             console.error('Error fetching data:', error);
         }
     });
 }
+
 updateRealTimeData(); 
 setInterval(updateRealTimeData, 1000);
 </script>

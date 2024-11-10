@@ -58,10 +58,11 @@
     .chat{
       margin-top: 20px;
       margin-bottom: auto;
+      
     }
     .card{
       margin-bottom: 45px;
-      height: 700px;
+      height: 600px;
       border-radius: 15px !important;
       background-color: rgba(0,0,0,0.4) !important;
     }
@@ -91,7 +92,7 @@
       color:white !important;
     }
     .search:focus{
-      box-shadow:none !important;
+     box-shadow:none !important;
       outline:0px !important;
     }
     .type_msg{
@@ -142,8 +143,8 @@
       background-color: rgba(0,0,0,0.3);
     }
     .user_img{
-      height: 70px;
-      width: 70px;
+      height: 50px;
+      width: 50px;
       border:1.5px solid #f5f6fa;
       object-fit: cover;
     }
@@ -155,7 +156,7 @@
     }
     .img_cont{
       position: relative;
-      height: 70px;
+      height: 50px;
       width: 70px;
     }
     .img_cont_msg{
@@ -168,18 +169,18 @@
       width:15px;
       background-color: #4cd137;
       border-radius: 50%;
-      bottom: 0.2em;
-      right: 0.4em;
+      bottom: 1.5em;
+      right: 1em;
       border:1.5px solid white;
     }
-    .online_icons{
+    .online_icons {
       position: absolute;
       height: 15px;
       width:15px;
       background-color: #c23616;
       border-radius: 50%;
-      bottom: 0.2em;
-      right: 0.4em;
+      bottom: 1.5em;
+      right: 1em;
       border:1.5px solid white;
     }
     .offline{
@@ -191,12 +192,12 @@
       margin-left: 15px;
     }
     .user_info span{
-      font-size: 20px;
+      font-size: 13px;
       color: white;
     }
     .user_info p{
-    font-size: 10px;
-    color: rgba(255,255,255,0.6);
+      font-size: 10px;
+      color: rgba(255,255,255,0.6);
     }
     .msg_cotainer{
       margin-top: auto;
@@ -236,13 +237,29 @@
       position: relative;
     }
     .contacts li.contact-item {
-      cursor: pointer;
+      cursor: pointer; 
     }
     .contacts li.contact-item:hover {
       background-color: rgba(0, 0, 0, 0.2);
     }
     .contact-item.active {
       background-color: rgba(0, 0, 0, 0.2);
+    }
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 15px;
+      border: 1px solid #f5c6cb;
+      border-radius: 5px;
+      z-index: 1000;
+      animation: fadeIn 0.5s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
     @media only screen and (max-width: 720px) {
       .chat{
@@ -256,6 +273,12 @@
       .card-footer{
         margin-bottom: 35px;
       }
+      .contacts_card {
+    display: block;
+  }
+  #conversation-card {
+    display: none; 
+  }
     }
   </style>
   <body>

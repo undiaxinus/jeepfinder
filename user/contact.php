@@ -58,10 +58,11 @@
     .chat{
       margin-top: 20px;
       margin-bottom: auto;
+      
     }
     .card{
       margin-bottom: 45px;
-      height: 700px;
+      height: 600px;
       border-radius: 15px !important;
       background-color: rgba(0,0,0,0.4) !important;
     }
@@ -71,7 +72,6 @@
       white-space: nowrap;
     }
     .msg_card_body{
-
       overflow-y: auto;
     }
     .card-header{
@@ -143,8 +143,8 @@
       background-color: rgba(0,0,0,0.3);
     }
     .user_img{
-      height: 70px;
-      width: 70px;
+      height: 50px;
+      width: 50px;
       border:1.5px solid #f5f6fa;
       object-fit: cover;
     }
@@ -156,7 +156,7 @@
     }
     .img_cont{
       position: relative;
-      height: 70px;
+      height: 50px;
       width: 70px;
     }
     .img_cont_msg{
@@ -169,8 +169,8 @@
       width:15px;
       background-color: #4cd137;
       border-radius: 50%;
-      bottom: 0.2em;
-      right: 0.4em;
+      bottom: 1.5em;
+      right: 1em;
       border:1.5px solid white;
     }
     .online_icons {
@@ -179,8 +179,8 @@
       width:15px;
       background-color: #c23616;
       border-radius: 50%;
-      bottom: 0.2em;
-      right: 0.4em;
+      bottom: 1.5em;
+      right: 1em;
       border:1.5px solid white;
     }
     .offline{
@@ -192,7 +192,7 @@
       margin-left: 15px;
     }
     .user_info span{
-      font-size: 20px;
+      font-size: 13px;
       color: white;
     }
     .user_info p{
@@ -273,6 +273,12 @@
       .card-footer{
         margin-bottom: 35px;
       }
+      .contacts_card {
+    display: block;
+  }
+  #conversation-card {
+    display: none; 
+  }
     }
   </style>
   <body>
@@ -280,6 +286,7 @@
     <section class="home-section">
       <div class="container-fluid h-100">
         <div class="row justify-content-center h-100">
+  <!--contact-->
           <div class="col-md-4 col-xl-3 chat">
             <div class="card mb-sm-3 mb-md-0 contacts_card">
               <div class="card-header">
@@ -321,6 +328,7 @@
               <div class="card-footer"></div>
             </div>
           </div>
+                          <!--chatbox-->
           <div class="col-md-8 col-xl-6 chat">
             <div class="card" id="conversation-card" style="display: none;">
               <div class="card-header msg_head">
@@ -428,6 +436,7 @@
           });
         }
       });
+      
     </script>
   </body>
 </html>
