@@ -18,131 +18,180 @@ if($_SESSION['Role'] != 'user'){
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-           
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.1);
         }
         .container {
-            background-color: rgba(0,0,0,0.4) !important;
-            padding: 20px;
-            border-radius: 10px;
+            background: rgba(17, 16, 29, 0.95) !important;
+            padding: 30px;
+            border-radius: 20px;
             max-width: 800px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
             width: 90%;
-            margin-bottom: 50px;
+            margin-bottom: 30px;
         }
         .title {
-            color: #ff0000;
-            font-size: 32px;
-            font-weight: bold;
-            margin-top: 0;
+            background: linear-gradient(45deg, #ff3366, #ff0000);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 30px;
             text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
         .subtitle {
-            font-size: 18px;
+            color: #fff;
+            font-size: 20px;
             font-weight: bold;
-            margin: 20px 0;
+            margin: 25px 0;
             text-align: center;
+            line-height: 1.4;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
         .content {
+            color: #fff;
             text-align: justify;
             font-size: 16px;
-            line-height: 1.5;
+            line-height: 1.8;
+            margin-bottom: 30px;
         }
         .content img {
             float: left;
-            margin-right: 20px;
-            margin-bottom: 10px;
+            margin-right: 30px;
+            margin-bottom: 20px;
             max-width: 40%;
             height: auto;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+        .content img:hover {
+            transform: scale(1.02);
         }
         .rating {
-            text-align: center;
-            margin: 20px 0;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .rating p {
+            color: #fff;
             margin: 10px 0;
+            font-size: 18px;
         }
         .rating i {
-            color: gold;
+            color: #ffd700;
             font-size: 30px;
             margin: 0 5px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .rating i:hover {
+            transform: scale(1.2);
         }
         .footer {
-            margin-top: 20px;
-            background-color: #333; 
+            margin-top: 30px;
+            background: rgba(0, 0, 0, 0.3);
             color: #fff;
-            padding: 10px;
-            border-radius: 0 0 10px 10px;
+            padding: 25px;
+            border-radius: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
+            gap: 20px;
         }
         .footer .social {
             text-align: center;
             flex: 1;
         }
         .footer .social p {
-            margin: 5px 0;
+            margin: 10px 0;
+            font-size: 16px;
+            letter-spacing: 1px;
         }
         .footer .social i {
             color: #fff;
-            font-size: 30px;
-            margin: 0 10px;
+            font-size: 24px;
+            margin: 0 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .footer .social i:hover {
+            transform: translateY(-3px);
+            color: #ff3366;
         }
         .footer .qr {
             text-align: center;
             flex: 1;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .footer .qr img {
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
+            border-radius: 10px;
+            margin: 10px 0;
+            transition: transform 0.3s ease;
+        }
+        .footer .qr img:hover {
+            transform: scale(1.05);
         }
         .footer .qr p {
-            margin: 5px 0;
+            margin: 10px 0;
+            font-size: 16px;
+            color: #fff;
         }
         @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
             .content img {
                 float: none;
                 display: block;
                 margin: 0 auto 20px auto;
-                max-width: 80%;
+                max-width: 90%;
             }
             .footer {
                 flex-direction: column;
-                align-items: center;
+                padding: 20px;
             }
-            .footer .social {
-                margin-bottom: 10px;
-            }
-            .footer .social i {
-                font-size: 24px;
-                margin: 0 5px;
+            .footer .social, .footer .qr {
+                width: 100%;
+                margin: 10px 0;
             }
             .footer .qr img {
-                width: 60px;
-                height: 60px;
+                width: 80px;
+                height: 80px;
             }
         }
         @media (max-width: 480px) {
             .title {
-                font-size: 24px;
+                font-size: 28px;
             }
             .subtitle {
-                font-size: 16px;
+                font-size: 18px;
             }
             .content {
-                font-size: 14px;
+                font-size: 15px;
             }
             .rating i {
                 font-size: 24px;
             }
             .footer .social i {
                 font-size: 20px;
-                margin: 0 3px;
+                margin: 0 10px;
             }
             .footer .qr img {
-                width: 50px;
-                height: 50px;
+                width: 70px;
+                height: 70px;
             }
         }
     </style>

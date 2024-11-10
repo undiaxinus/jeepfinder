@@ -68,16 +68,16 @@
     font-family: "Poppins" , sans-serif;
   }
   body{
-    background: #7F7FD5;
-    background: -webkit-linear-gradient(to right, #91EAE4, #86A8E7, #7F7FD5);
-    background: linear-gradient(to right, #91EAE4, #86A8E7, #7F7FD5);
+    background: #1a1a2e;
   }
   .sidebar{
     position: fixed;
     left: 0;
     height: 100%;
     width: 78px;
-    background: #11101D;
+    background: rgba(17, 16, 29, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     padding: 6px 14px;
     z-index: 99;
     transition: all 0.5s ease;
@@ -206,10 +206,17 @@
     align-items: center;
     text-decoration: none;
     transition: all 0.4s ease;
-    background: #11101D;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(4px);
+    margin: 8px 0;
   }
   .sidebar li a:hover{
-    background: #FFF;
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateX(5px);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3),
+                inset 0 0 15px rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
   }
   .sidebar li a .links_name{
     color: #fff;
@@ -342,7 +349,9 @@
       left: 0;
       width: 100%; 
       height: 45px; 
-      background: #11101D;
+      background: rgba(17, 16, 29, 0.95);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -398,6 +407,24 @@
     i{
       padding-top: 5px;
     }
+  }
+  .sidebar, .sidebar li a, .sidebar i, .links_name {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  /* Glowing icon on hover */
+  .sidebar li a:hover i {
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
+                 0 0 20px rgba(255, 255, 255, 0.8);
+  }
+  /* Glowing text on hover */
+  .sidebar li a:hover .links_name {
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  }
+  /* Smooth transitions */
+  .sidebar li a, .sidebar li i, .sidebar li .links_name {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   </style>
   <body>

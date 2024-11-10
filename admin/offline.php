@@ -5,7 +5,7 @@
         exit();
     }
     include "../connection/conn.php";
-    $sql = "SELECT * FROM `user` ";
+    $sql = "SELECT * FROM `user`";
     $result = $conn->query($sql);
     $sql = "SELECT COUNT(*) AS jeep FROM `locate` ";
     $results = $conn->query($sql);
@@ -66,83 +66,108 @@
                 margin-left: 90px;
                 display: grid;
                 grid-template-columns: repeat(4, 1fr);
-                gap: 10px;
-                justify-items: center;
+                gap: 20px;
+                padding: 20px;
             }
             .border1 {
-                margin-left: 70px;
-                display: grid;
-                grid-template-columns: repeat(1, 1fr);
-                gap: 10px;
-                justify-items: center;
+                margin: 20px 90px;
             }
             a {
                 text-decoration: none;
                 color: #ffffff;
             }
             .card {
-                opacity: 80%;
-                margin-top: 30px;
-                background-color: #ffffff;
-                border-radius: 10px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                padding: 20px;
-                text-align: center;
-                width: 95%;
-                transition: transform 0.3s ease;
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border-radius: 20px;
+                padding: 25px;
+                position: relative;
+                overflow: hidden;
+                transition: all 0.3s ease;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
             }
-            .card1 {
-                opacity: 80%;
-                margin-top: 30px;
-                background-color: red;
-                border-radius: 10px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                text-align: center;
-                width: 95%;
-                transition: transform 0.3s ease;
-            }
-            .card1 h2{
-                margin-top:70px
-            }
-            .border i {
-                margin-left: -60px;
-                opacity: 50%;
+            .card::before {
+                content: '';
                 position: absolute;
-                font-size: 110px;
-                margin-top: -30px;
-                border-radius: 50%;
-                padding: 10px;
-                justify-content: center;
-                align-items: center;
-                filter: grayscale(50%);
-                transition: transform 0.3s ease;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(
+                    45deg,
+                    rgba(255, 255, 255, 0.1),
+                    rgba(255, 255, 255, 0.05)
+                );
+                z-index: 1;
             }
-            .card:hover, .border i:hover {
-                transform: scale(1.05);
+            .card i {
+                font-size: 48px;
+                color: rgba(255, 255, 255, 0.9);
+                margin-bottom: 15px;
+                position: relative;
+                z-index: 2;
+                transition: all 0.3s ease;
+            }
+            .card h2 {
+                color: white;
+                font-size: 24px;
+                font-weight: 600;
+                margin: 10px 0;
+                position: relative;
+                z-index: 2;
+            }
+            .card p {
+                color: rgba(255, 255, 255, 0.7);
+                font-size: 14px;
+                position: relative;
+                z-index: 2;
+            }
+            /* Card specific colors */
+            .card.blue {
+                background: linear-gradient(135deg, #4e54c8, #8f94fb);
+            }
+            .card.green {
+                background: linear-gradient(135deg, #11998e, #38ef7d);
+            }
+            .card.red {
+                background: linear-gradient(135deg, #eb3349, #f45c43);
+            }
+            .card.orange {
+                background: linear-gradient(135deg, #ff8008, #ffc837);
+            }
+            /* Hover effects */
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.25);
+            }
+            .card:hover i {
+                transform: scale(1.1);
             }
             table {
                 width: 100%;
-                border-collapse: collapse;
-                margin-top: 10px;
-                background-color: #fff;
-                table-layout: fixed;
+                border-collapse: separate;
+                border-spacing: 0;
+                color: white;
+                min-width: 800px;
             }
             th, td {
-                border: 1px solid #ddd;
-                padding: 8px;
-                text-align: left;
-                overflow: hidden;
-                text-overflow: ellipsis;
+                text-align: center;  /* Center align all table content */
+                padding: 15px 20px;
+                vertical-align: middle;  /* Vertically center content */
             }
             th {
-                background-color: #f2f2f2;
-                color: #333;
+                background: rgba(76, 76, 255, 0.2);
+                font-weight: 600;
+                font-size: 14px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+                white-space: nowrap;
             }
-            tr:nth-child(even) {
-                background-color: #f9f9f9;
-            }
-            tr:hover {
-                background-color: #f2f2f2;
+            tr:hover td {
+                background: rgba(76, 76, 255, 0.1);
+                transition: all 0.3s ease;
             }
             .search-container {
                 margin-bottom: 10px;
@@ -153,10 +178,7 @@
                 border: 1px solid #ddd;
                 border-radius: 5px;
                 font-size: 14px;
-                margin-left: 140vh;
-                margin-top: 2vh;
                 right: 50px;
-                top: 180px; 
                 position: absolute; 
                 z-index:100;
             }
@@ -182,125 +204,429 @@
             }
             .addemergency {
                 position: fixed;
-                bottom: 20px;
-                right: 20px; 
-                z-index: 2000;
+                bottom: 80px;
+                right: 30px;
+                z-index: 1000;
             }
-            .addemergency details {
-                position: relative;
-            }
+
             .addemergency summary {
                 list-style: none;
                 cursor: pointer;
-                font-size: 9px;
             }
-            .addemergency ul {
+
+            .addemergency summary i {
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+                color: white;
+                background: #4CAF50;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                transition: all 0.3s ease;
+            }
+
+            .addemergency summary::-webkit-details-marker {
                 display: none;
-                list-style: none;
-                padding: 0;
-                margin: 0;
             }
-            .addemergency details[open] ul {
-                width: 250px;
-                display: block;
+
+            /* Hover effect */
+            .addemergency summary i:hover {
+                transform: scale(1.05);
+                background: #45a049;
+            }
+
+            @media (max-width: 768px) {
+                .addemergency summary i {
+                    width: 40px;
+                    height: 40px;
+                    font-size: 18px;
+                }
+            }
+
+            .addemergency ul {
                 position: absolute;
-                background-color: #ffffff;
-                border: 1px solid #ddd;
-                border-radius: 5px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                top: -80px;
-                right: 40px;
-                z-index: 1000;
+                bottom: 60px;
+                right: 0;
+                list-style: none;
+                background: white;
+                border-radius: 12px;
+                padding: 8px 0;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                min-width: 150px;
             }
+
             .addemergency ul li {
-                padding: 10px;
-                border-bottom: 1px solid #ddd;
+                padding: 8px 20px;
+                transition: background 0.3s ease;
             }
-            .addemergency ul li:last-child {
-                border-bottom: none;
+
+            .addemergency ul li a {
+                color: #333 !important;
+                text-decoration: none;
+                display: block;
+                font-size: 14px;
+                font-weight: 500;
             }
-            .addemergency ul li:hover {
-                background-color: #f0f0f0;
+
+            /* Animation for menu */
+            .addemergency ul {
+                animation: slideUp 0.3s ease-out;
             }
-            .addemergency i{
-                font-size: 50px;
-                color:  #007bff;
+
+            @keyframes slideUp {
+                0% {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+                100% {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
             }
-            @media only screen and (max-width: 768px) {
-                .border {
-                    margin-left: 10px;
-                    grid-template-columns: repeat(2, 1fr);
-                }
-                .border1 {
-                    margin-left: 0px;
-                    grid-template-columns: repeat(1, 1fr);
-                }
-                .card {
-                    opacity: 80%;
-                    margin-top: 30px;
-                    background-color: #ffffff;
-                    border-radius: 10px;
-                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                    padding: 20px;
-                    text-align: center;
-                    width: 95%;
-                    transition: transform 0.3s ease;
-                }
-                .border i {
-                    margin-left: -75px;
-                    opacity: 50%;
-                    position: absolute;
-                    font-size: 120px;
-                }
-                .search-container input {
-                    width: 20%;
-                    padding: 5px;
-                    border: 1px solid #ddd;
-                    border-radius: 5px;
-                    font-size: 10px;
-                    margin-left: 80%;
-                    margin-top: 2vh;
-                    right: 30px;
-                    top: 380px;
-                }
-                .card h2 {
-                    font-size: 20px;
-                }
-                .card p {
-                    font-size: 15px;
-                }
-                .card1 {
-                    padding: 5px;
-                    padding-top: 5px;
-                    padding-bottom: 0px;
-                    background-color: red;
-                    width: 100%;
-                }
-                .card1 h2 {
-                    font-size: 15px;
-                    margin-top: 20px;
-                }
-                th, td {
-                    font-size: 10px;
-                    text-overflow: ellipsis; 
-                    white-space: nowrap; 
-                }
-                .btn {
-                    padding: 1px 5px;
-                    background-color: #4CAF50;
-                    color: white;
-                    border: none;
-                    border-radius: 5px;
-                    text-align: center;
-                    text-decoration: none;
-                    display: inline-block;
-                    font-size: 10px;
-                    cursor: pointer;
-                }
+
+            /* Mobile Responsive */
+            @media (max-width: 768px) {
                 .addemergency {
                     bottom: 70px;
-                    right: 20px; 
-                    position: fixed;
+                    right: 20px;
+                }
+                
+                .addemergency summary {
+                    width: 45px;
+                    height: 45px;
+                }
+                
+                .addemergency summary i {
+                    font-size: 22px;
+                }
+            }
+            .header-container {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin: 20px 90px;
+                padding: 10px 0;
+                position: relative;
+                z-index: 100;
+            }
+
+            .header-container h2 {
+                color: #fff;
+                font-size: 24px;
+                font-weight: 600;
+                margin: 0;
+            }
+
+            .search-container {
+                position: relative;
+                margin: 0;
+                padding: 0;
+            }
+
+            .search-container input {
+                width: 250px;
+                padding: 10px 15px;
+                padding-left: 40px;
+                border: none;
+                border-radius: 8px;
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                color: white;
+                font-size: 14px;
+                transition: all 0.3s ease;
+                margin: 0;
+            }
+
+            .search-container::before {
+                content: '\f002';
+                font-family: 'BoxIcons';
+                position: absolute;
+                left: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: rgba(255, 255, 255, 0.6);
+                font-size: 16px;
+            }
+
+            .search-container input::placeholder {
+                color: rgba(255, 255, 255, 0.6);
+            }
+
+            .search-container input:focus {
+                outline: none;
+                background: rgba(255, 255, 255, 0.15);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            @media (max-width: 768px) {
+                .header-container {
+                    flex-direction: row;
+                    margin: 15px;
+                    padding: 5px;
+                }
+
+                .header-container h2 {
+                    font-size: 18px;
+                }
+
+                .search-container input {
+                    width: 150px;
+                    padding: 8px 15px 8px 35px;
+                    font-size: 13px;
+                }
+
+                .search-container::before {
+                    font-size: 14px;
+                    left: 12px;
+                }
+            }
+
+            /* For very small screens */
+            @media (max-width: 480px) {
+                .header-container {
+                    gap: 10px;
+                }
+
+                .header-container h2 {
+                    font-size: 16px;
+                }
+
+                .search-container input {
+                    width: 120px;
+                }
+            }
+
+            #map {
+                height: 70vh;
+                border-radius: 0 0 15px 15px;
+                overflow: hidden;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .table-container {
+                padding: 20px;
+                background: rgba(255, 255, 255, 0.05);
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0;
+                color: white;
+                min-width: 800px; /* Ensures table doesn't get too squeezed */
+            }
+
+            th {
+                background: rgba(76, 76, 255, 0.2);
+                padding: 15px 20px;
+                text-align: center;
+                font-weight: 600;
+                font-size: 14px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+                white-space: nowrap;
+            }
+
+            td {
+                padding: 15px 20px;
+                background: rgba(255, 255, 255, 0.05);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            /* Column widths */
+            th:nth-child(1), td:nth-child(1) { width: 30%; }  /* Drivers Information */
+            th:nth-child(2), td:nth-child(2) { width: 30%; }  /* Jeepney Data */
+            th:nth-child(3), td:nth-child(3) { width: 20%; text-align: center; }  /* Status */
+            th:nth-child(4), td:nth-child(4) { width: 20%; text-align: center; }  /* Action */
+
+            /* Mobile Responsive Styles */
+            @media (max-width: 768px) {
+                .border1 {
+                    margin: 10px;
+                }
+                
+                .table-container {
+                    padding: 10px;
+                }
+
+                table {
+                    min-width: 600px;
+                }
+                
+                th, td {
+                    padding: 10px;
+                    font-size: 12px;
+                }
+                
+                /* Adjust text wrapping for mobile */
+                td {
+                    white-space: normal;
+                    word-break: break-word;
+                }
+                
+                /* Make buttons stack nicely */
+                .btn {
+                    padding: 6px 10px;
+                    margin-bottom: 4px;
+                    font-size: 12px;
+                }
+                
+                /* Status badge adjustments */
+                .status {
+                    padding: 4px 8px;
+                    font-size: 11px;
+                }
+            }
+
+            /* Custom scrollbar for the table container */
+            .table-container::-webkit-scrollbar {
+                height: 6px;
+            }
+
+            .table-container::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 3px;
+            }
+
+            .table-container::-webkit-scrollbar-thumb {
+                background: rgba(255, 255, 255, 0.3);
+                border-radius: 3px;
+            }
+
+            .table-container::-webkit-scrollbar-thumb:hover {
+                background: rgba(255, 255, 255, 0.4);
+            }
+
+            /* Data cell formatting */
+            td strong {
+                display: none; /* Hide labels on desktop */
+            }
+
+            /* Mobile optimized data display */
+            @media (max-width: 480px) {
+                table {
+                    min-width: 400px;
+                }
+                
+                td strong {
+                    display: inline-block;
+                    margin-right: 5px;
+                    font-weight: 600;
+                    color: rgba(255, 255, 255, 0.8);
+                }
+                
+                /* Stack information in cells */
+                td div {
+                    margin-bottom: 4px;
+                }
+                
+                /* Adjust column widths for mobile */
+                th:nth-child(1), td:nth-child(1) { width: 10%; }
+                th:nth-child(2), td:nth-child(2) { width: 30%; }
+                th:nth-child(3), td:nth-child(3) { width: 25%; }
+                th:nth-child(4), td:nth-child(4) { width: 15%; }
+                th:nth-child(5), td:nth-child(5) { width: 20%; }
+            }
+
+            /* Ensure buttons remain clickable and visible */
+            .btn {
+                min-width: 60px;
+                white-space: nowrap;
+            }
+
+            /* Add these styles */
+            .info-row {
+                margin-bottom: 8px;
+                line-height: 1.4;
+                text-align: left;
+            }
+
+            .info-row:last-child {
+                margin-bottom: 0;
+            }
+
+            .info-row strong {
+                display: inline-block;
+                color: rgba(255, 255, 255, 0.7);
+                margin-right: 5px;
+                font-weight: 500;
+            }
+
+            .driver-info, .jeepney-info {
+                padding: 10px 0;
+            }
+
+            td {
+                vertical-align: top;
+                background: rgba(255, 255, 255, 0.05);
+            }
+
+            @media (max-width: 768px) {
+                .info-row {
+                    margin-bottom: 6px;
+                    font-size: 12px;
+                }
+                
+                .info-row strong {
+                    font-size: 12px;
+                }
+            }
+
+            .addemergency li a {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 10px 15px;
+                color: black;
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+
+            .addemergency li a i {
+                font-size: 20px;
+                color: #4776E6;
+            }
+
+            .addemergency li a span {
+                font-size: 14px;
+            }
+
+            .addemergency li a:hover {
+                background: #f5f5f5;
+                border-radius: 8px;
+            }
+
+            /* Status styling */
+            .status {
+                display: inline-block;
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-size: 13px;
+                font-weight: 500;
+            }
+
+            /* Action buttons container */
+            .action-buttons {
+                display: flex;
+                gap: 8px;
+                justify-content: center;  /* Center the action buttons */
+            }
+
+            /* Mobile responsive adjustments */
+            @media (max-width: 768px) {
+                table {
+                    min-width: 600px;
+                }
+                
+                th, td {
+                    padding: 10px;
+                    font-size: 12px;
                 }
             }
         </style>
@@ -308,64 +634,81 @@
     <body>
         <?php include "navigation.php" ?>
         <section class="home-section">
-            <div class="border">
+        <div class="border">
+                <!-- Card 1 -->
                 <a href="users.php?id=<?php echo $id ?>">
-                    <div class="card" style="background-color: blue;">
+                    <div class="card blue">
                         <i class='bx bxs-group'></i>
                         <h2>Users <?php echo $user ?></h2>
-                        <p>This is the content of total account.</p>
+                        <p>Registered accounts</p>
                     </div>
                 </a>
+                <!-- Card 2 -->
                 <a href="online.php?id=<?php echo $id ?>">
-                    <div class="card" style="background-color: green;">
+                    <div class="card green">
                         <i class='bx bxs-user'></i>
                         <h2>Online <?php echo $online ?></h2>
-                        <p>This is the content of total account online.</p>
+                        <p>Currently active users</p>
                     </div>
                 </a>
+                <!-- Card 3 -->
                 <a href="offline.php?id=<?php echo $id ?>">
-                    <div class="card" style="background-color: red;">
+                    <div class="card red">
                         <i class='bx bxs-ghost'></i>
                         <h2>Offline <?php echo $offline ?></h2>
-                        <p>This is the content of total account offline.</p>
+                        <p>Inactive user accounts</p>
                     </div>
                 </a>
+                <!-- Card 4 -->
                 <a href="dashboard.php?id=<?php echo $id ?>">
-                    <div class="card" style="background-color: orange;">
+                    <div class="card orange">
                         <i class='bx bxs-car'></i>
                         <h2>Jeepney <?php echo $jeep ?></h2>
-                        <p>This is the content of total jeepney.</p>
+                        <p>Registered jeepneys</p>
                     </div>
                 </a>
             </div>
-            <div class="search-container">
-                <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search..">
+            
+            <div class="header-container">
+                <h2>Account Offline</h2>
+                <div class="search-container">
+                    <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search jeepney...">
+                </div>
             </div>
             <div class="border1">
                 <div class="card1">
-                    <h2 style="color: #fff">Users Offline</h2>
+                    
                     <div class="table-container">
                         <table id="jeepneyTable">
                             <tr>
                                 <th>Name</th>
                                 <th>Email</th>
-                                <th>User ID</th>
-                                <th>Password</th>
-                                <th>Account ID</th>
+                                
+                                <th>Account Role</th>
                                 <th>Status</th>
                                 <th>Action</th>
-                            </tr> 
+                            </tr>
                         </table>
                         <hr style="border: 2px black solid">
-                    </div> 
+                    </div>
                 </div>
             </div>
             <div class="addemergency" id="toggleAddEmergency">
                 <details id="addEmergencyDetails">
                     <summary><i class='bx bxs-plus-circle'></i></summary>
                     <ul>
-                        <li><a href='Add_Account.php?id=<?php echo $id ?>' style="color:black;"> Add Account</a></li>
-                        <li><a href='Add_Jeepney.php?id=<?php echo $id ?>' style="color:black;">Add Jeepney</a></li>
+                        <li>
+                            <a href='Add_Account.php?id=<?php echo $id ?>'>
+                                <i class='bx bxs-user-plus'></i>
+                                <span>Add Account</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href='Add_Jeepney.php?id=<?php echo $id ?>'>
+                                <i class='bx bxs-car'></i>
+                                <span>Add Jeepney</span>
+                            </a>
+                        </li>
                     </ul>
                 </details>
             </div>
