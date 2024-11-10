@@ -14,7 +14,21 @@ if(isset($_POST['submit'])) {
     $email = $_POST['email'];
     $user = $_POST['user'];
     $pass = $_POST['password'];
+    $confirm_pass = $_POST['confirm_password'];
     $account = "user";
+
+    // Check if passwords match
+    if($pass !== $confirm_pass) {
+        echo "<script>
+            swal({
+                title: 'Error',
+                text: 'Passwords don\'t match!',
+                icon: 'error',
+                button: 'OK',
+            });
+        </script>";
+        exit();
+    }
 
     $hashedPassword = hash('sha256', $pass);
 
@@ -50,222 +64,300 @@ if(isset($_POST['submit'])) {
     
 </head>
 
-<style type="text/css">
-    .jeep img{
-        width: 20%;
-        top: 0;
-        z-index: 100%;
-        filter: drop-shadow();
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+    body {
+        background: linear-gradient(135deg, #24243e, #302b63, #0f0c29) fixed;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        overflow-y: auto;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px 0;
     }
+
+    /* Add custom scrollbar styling */
+    body::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    body::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    body::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+    }
+
+    body::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
     .jeep {
         position: relative;
+        width: 300px;
+        margin: 0 auto;
+        transform: translateY(30px);
     }
-    .eye-image{
-        margin-left: 40%;
+
+    .face img {
+        width: 100%;
+        height: auto;
+        filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.3));
+        transition: transform 0.3s ease;
     }
-    .eye-ball img{
-        
+
+    .eye-white {
         position: absolute;
-        top: -10px;
-        
-        margin-left: 40%;
-         z-index: 100%;
+        width: 60px;
+        height: 60px;
+        background: #fff;
+        border-radius: 50%;
+        top: 43%;
+        left: 27%;
+        transform: translateY(-50%);
+        box-shadow: 
+            inset 0 0 10px rgba(0,0,0,0.2),
+            inset 2px 2px 4px rgba(0,0,0,0.3),
+            inset -2px -2px 4px rgba(255,255,255,0.8),
+            0 0 5px rgba(0,0,0,0.1);
+        overflow: hidden;
+        background: radial-gradient(
+            circle at 30% 30%,
+            #ffffff 0%,
+            #f0f0f0 50%,
+            #e0e0e0 100%
+        );
     }
 
-  @import url(https://fonts.googleapis.com/css?family=Dancing+Script|Roboto);
-*, *:after, *:before {
-  box-sizing: border-box;
-}
+    .eye-white.rgt {
+        left: 53%;
+    }
 
-body {
-  background:rgba(180.46, 179.70, 217.81, 0.37);
-  text-align: center;
-  font-family: 'Roboto', sans-serif;
-  
-}
+    .eye-ball {
+        position: absolute;
+        width: 15px;
+        height: 15px;
+        background: #000;
+        border-radius: 50%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        transition: all 0.1s ease;
+    }
 
-.jeep{
-  position: relative;
-  width: 200px;
-  margin: 50px auto;
-  top: -100px;
-}
+    form {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 40px;
+        padding-right: 60px;
+        border-radius: 20px;
+        width: 320px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        transform: translateY(-30px);
+    }
 
-.face img{
-  width: 300px;
-  height: 300px;
-  margin: 50px auto;
-  left: -25%;
-  z-index: 50;
-  position: relative;
-}
+    h1 {
+        color: #fff;
+        font-size: 28px;
+        margin-bottom: 30px;
+        text-align: center;
+        font-weight: 600;
+        margin-left: 15px;
+    }
 
-.ear, .ear:after {
-  position: absolute;
-  width: 80px;
-  height: 80px;
-  background: #000;
-  z-index: 5;
-  border: 10px solid #fff;
-  left: -15px;
-  top: -15px;
-  border-radius: 100%;
-}
-.ear:after {
-  content: '';
-  left: 125px;
-}
+    .form-group {
+        margin-bottom: 25px;
+        position: relative;
+    }
 
-.eye-shade {
-  background: #000;
-  width: 50px;
-  height: 80px;
-  margin: 10px;
-  position: absolute;
-  top: 35px;
-  left: 25px;
-  transform: rotate(220deg);
-  border-radius: 25px/20px 30px 35px 40px;
-}
-.eye-shade.rgt {
-  transform: rotate(140deg);
-  left: 105px;
-}
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        color: #fff;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
 
-.eye-white {
-  position: absolute;
-  width: 50px;
-  height: 50px;
-  border-radius: 100%;
-  
-  z-index: 500;
-  left: 35px;
-  top: 160px;
-  overflow: hidden;
-}
-.eye-white.rgt {
-  right: 35px;
-  left: auto;
-}
+    .form-control:focus {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.3);
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        outline: none;
+    }
 
-.eye-ball {
-  position: absolute;
-  width: 0px;
-  height: 0px;
-  left: 30px;
-  top: 30px;
-  max-width: 30px;
-  max-height: 30px;
-  transition: 0.1s;
-}
-.eye-ball:after {
-  content: '';
-  background: #000;
-  position: absolute;
-  border-radius: 100%;
-  right: 0;
-  bottom: 0px;
-  width: 20px;
-  height: 20px;
-}
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
 
+    .form-label {
+        position: absolute;
+        left: 15px;
+        top: -10px;
+        background: rgba(17, 16, 29, 0.95);
+        padding: 0 5px;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 12px;
+        border-radius: 5px;
+    }
 
+    .btn {
+        background: linear-gradient(45deg, #4776E6, #8E54E9);
+        color: #fff;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 10px;
+        cursor: pointer;
+        width: 100%;
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+        margin-left: 15px;
+    }
 
-form {
-  display: none;
-  max-width: 400px;
-  padding: 20px 40px;
-  background: #fff;
-  height: 550px;
-  margin: auto;
-  display: block;
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
-  transition: 0.3s;
-  position: relative;
-  transform: translateY(-250px);
-  z-index: 500;
-  border: 1px solid #eee;
-  border-radius: 20px;
-}
-form.up {
-  transform: translateY(-380px);
-}
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(71, 118, 230, 0.3);
+    }
 
-h1 {
-  color: #02007B;
-  font-family: sans-serif;
-}
+    .login-link {
+        text-align: center;
+        margin-top: 20px;
+        margin-left: 15px;
+    }
 
-.btn {
-  background: #fff;
-  padding: 5px;
-  width: 150px;
-  height: 35px;
-  border: 1px solid #02007B;
-  margin-top: 25px;
-  cursor: pointer;
-  transition: 0.3s;
-  box-shadow: 0 50px #02007B inset;
-  color: #fff;
-}
-.btn:hover {
-  box-shadow: 0 0 #02007B inset;
-  color: #02007B;
-}
-.btn:focus {
-  outline: none;
-}
+    .login-link a {
+        color: #fff;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
 
-.form-group {
-  position: relative;
-  font-size: 15px;
-  color: #02007B;
-}
-.form-group + .form-group {
-  margin-top: 30px;
-}
-.form-group .form-label {
-  position: absolute;
-  z-index: 1;
-  left: 0;
-  top: 5px;
-  transition: 0.3s;
-}
-.form-group .form-control {
-  width: 100%;
-  position: relative;
-  z-index: 3;
-  height: 35px;
-  background: none;
-  border: none;
-  padding: 5px 0;
-  transition: 0.3s;
-  border-bottom: 1px solid #777;
-  color: #555;
-}
-.form-group .form-control:invalid {
-  outline: none;
-}
-.form-group .form-control:focus, .form-group .form-control:valid {
-  outline: none;
-  box-shadow: 0 1px #02007B;
-  border-color: #02007B;
-}
-.form-group .form-control:focus + .form-label, .form-group .form-control:valid + .form-label {
-  font-size: 12px;
-  color: #02007B;
-  transform: translateY(-15px);
-}
-.wrong-entry {
-  -webkit-animation: wrong-log 0.3s;
-  animation: wrong-log 0.3s;
-}
-.wrong-entry .alert {
-  opacity: 1;
-  transform: scale(1, 1);
-}
+    .login-link a:hover {
+        color: #4776E6;
+    }
 
+    /* Floating animation for jeepney */
+    @keyframes float {
+        0%, 100% { transform: translateY(30px); }
+        50% { transform: translateY(20px); }
+    }
 
+    .jeep {
+        animation: float 3s ease-in-out infinite;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 480px) {
+        form {
+            width: 280px;
+            padding: 30px;
+        }
+
+        .jeep {
+            width: 250px;
+        }
+    }
+
+    /* Add these styles */
+    .password-message {
+        position: absolute;
+        bottom: -20px;
+        left: 0;
+        font-size: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .password-match {
+        color: #4CAF50;
+    }
+
+    .password-mismatch {
+        color: #f44336;
+    }
+
+    .form-control.valid {
+        border-color: rgba(76, 175, 80, 0.5);
+    }
+
+    .form-control.invalid {
+        border-color: rgba(244, 67, 54, 0.5);
+    }
+
+    /* Add these validation styles */
+    .form-message {
+        position: absolute;
+        bottom: -20px;
+        left: 0;
+        font-size: 12px;
+        color: #f44336;
+        transition: all 0.3s ease;
+    }
+
+    .input-valid {
+        color: #4CAF50;
+    }
+
+    .input-invalid {
+        color: #f44336;
+    }
+
+    .form-control.valid {
+        border-color: rgba(76, 175, 80, 0.5) !important;
+        box-shadow: 0 0 5px rgba(76, 175, 80, 0.2);
+    }
+
+    .form-control.invalid {
+        border-color: rgba(244, 67, 54, 0.5) !important;
+        box-shadow: 0 0 5px rgba(244, 67, 54, 0.2);
+    }
+
+    /* Add transition for smooth border color change */
+    .form-control {
+        transition: all 0.3s ease;
+    }
+
+    /* Update validation styles to match confirm password */
+    .form-message {
+        position: absolute;
+        bottom: -20px;
+        left: 0;
+        font-size: 12px;
+        color: #f44336;
+        transition: all 0.3s ease;
+    }
+
+    .form-control {
+        transition: all 0.3s ease;
+    }
+
+    .form-control.valid {
+        border-color: rgba(76, 175, 80, 0.5) !important;
+        box-shadow: 0 0 5px rgba(76, 175, 80, 0.2);
+    }
+
+    .form-control.invalid {
+        border-color: rgba(244, 67, 54, 0.5) !important;
+        box-shadow: 0 0 5px rgba(244, 67, 54, 0.2);
+    }
+
+    /* Add these styles for the warning text */
+    .warning-text {
+        color: #f44336;
+        font-size: 12px;
+        margin-top: 5px;
+    }
 </style>
 <body>
   
@@ -285,44 +377,44 @@ h1 {
   </div>
 </div>
 <form action="" method="post">
-  <div class="hand"></div>
-  <div class="hand rgt"></div>
-  <h1>Sign In</h1>
-  <div class="form-group">
-    <input type="text" name="fname" required="required" class="form-control"/>
-    <label class="form-label">First Name</label>
-  </div>
-  <div class="form-group">
-    <input type="text" name="mname" placeholder="(Optional)" class="form-control"/>
-    <label class="form-label">Middle Name</label>
-  </div>
-  <div class="form-group">
-    <input type="text" name="lname" required="required" class="form-control"/>
-    <label class="form-label">Last Name</label>
-  </div>
-  <div class="form-group">
-    <input type="text" name="email" required="required" class="form-control"/>
-    <label class="form-label">Email</label>
-  </div>
-  
-  <?php
-  $random = rand();
-  $rand = hash('sha256', $random);
-  ?>
-  <div class="form-group">
-    <input type="hidden" name="user" value="<?php echo $rand;?>" class="form-control"/>
-  
-  </div>
-
-  <div class="form-group">
-    <input id="password" type="password" name="password" required="required" class="form-control"/>
-    <label class="form-label">Password</label>
-    <button class="btn" type="submit" name="submit" >Sign In</button>
-  </div>
-  <div class="form-group">
-    <b><a href="login.php" style="text-decoration: none;color: #02007B;">Login</a></b>
-  </div>
-
+    <h1>Create Account</h1>
+    <div class="form-group">
+        <input type="text" name="fname" id="fname" required="required" class="form-control" placeholder="Enter your first name"/>
+        <label class="form-label">First Name</label>
+        <div class="form-message"></div>
+    </div>
+    <div class="form-group">
+        <input type="text" name="mname" id="mname" class="form-control" placeholder="Optional"/>
+        <label class="form-label">Middle Name</label>
+        <div class="form-message"></div>
+    </div>
+    <div class="form-group">
+        <input type="text" name="lname" id="lname" required="required" class="form-control" placeholder="Enter your last name"/>
+        <label class="form-label">Last Name</label>
+        <div class="form-message"></div>
+    </div>
+    <div class="form-group">
+        <input type="email" name="email" id="email" required="required" class="form-control" placeholder="Enter your email"/>
+        <label class="form-label">Email</label>
+        <div class="form-message"></div>
+    </div>
+    <div class="form-group">
+        <input type="hidden" name="user" value="<?php echo $rand;?>"/>
+    </div>
+    <div class="form-group">
+        <input id="password" type="password" name="password" required="required" class="form-control" placeholder="Enter your password"/>
+        <label class="form-label">Password</label>
+        <div class="form-message"></div>
+    </div>
+    <div class="form-group">
+        <input id="confirm_password" type="password" name="confirm_password" required="required" class="form-control" placeholder="Confirm your password"/>
+        <label class="form-label">Confirm Password</label>
+        <div class="password-message"></div>
+    </div>
+    <button class="btn" type="submit" name="submit">Sign Up</button>
+    <div class="login-link">
+        <a href="login.php">Already have an account? Login</a>
+    </div>
 </form>
 <!-- partial -->
   <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
@@ -380,10 +472,165 @@ $('.btn').click(function(){
         window.location.href = "login.php";
     });
 <?php endif; ?>
+
+// Password validation
+$(document).ready(function() {
+    $('#confirm_password').on('keyup', function() {
+        const password = $('#password').val();
+        const confirmPassword = $(this).val();
+        const messageElement = $('.password-message');
+        
+        if (confirmPassword === '') {
+            messageElement.text('');
+            $(this).removeClass('valid invalid');
+        } else if (password === confirmPassword) {
+            messageElement.text('Passwords match').removeClass('password-mismatch').addClass('password-match');
+            $(this).removeClass('invalid').addClass('valid');
+        } else {
+            messageElement.text('Passwords do not match').removeClass('password-match').addClass('password-mismatch');
+            $(this).removeClass('valid').addClass('invalid');
+        }
+    });
+
+    // Also check when password is changed
+    $('#password').on('keyup', function() {
+        if ($('#confirm_password').val() !== '') {
+            $('#confirm_password').trigger('keyup');
+        }
+    });
+
+    // Form submission validation
+    $('form').on('submit', function(e) {
+        const password = $('#password').val();
+        const confirmPassword = $('#confirm_password').val();
+
+        if (password !== confirmPassword) {
+            e.preventDefault();
+            swal({
+                title: "Error",
+                text: "Passwords don't match!",
+                icon: "error",
+                button: "OK",
+            });
+        }
+    });
+});
+
+password.onchange = validatePassword;
+confirm_password.onkeyup = validatePassword;
+
+// Update your form submission
+$('form').on('submit', function(e) {
+    if(password.value != confirm_password.value) {
+        e.preventDefault();
+        swal({
+            title: "Error",
+            text: "Passwords don't match!",
+            icon: "error",
+            button: "OK",
+        });
+    }
+});
+
+// Form validation for all inputs
+$(document).ready(function() {
+    // Name validation function
+    function validateName(input) {
+        const value = input.val();
+        const messageElement = input.siblings('.form-message');
+        
+        if (value === '' && input.prop('required')) {
+            messageElement.text('Please fill out this field.');
+            input.removeClass('valid').addClass('invalid');
+            return false;
+        } else if (value.length < 2 && value !== '') {
+            messageElement.text('Must be at least 2 characters');
+            input.removeClass('valid').addClass('invalid');
+            return false;
+        } else if (!/^[a-zA-Z\s]*$/.test(value) && value !== '') {
+            messageElement.text('Only letters allowed');
+            input.removeClass('valid').addClass('invalid');
+            return false;
+        } else if (value !== '') {
+            messageElement.text('');
+            input.removeClass('invalid').addClass('valid');
+            return true;
+        } else {
+            messageElement.text('');
+            input.removeClass('valid invalid');
+            return true;
+        }
+    }
+
+    // Email validation function
+    function validateEmail(input) {
+        const value = input.val();
+        const messageElement = input.siblings('.form-message');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        if (value === '') {
+            messageElement.text('Please fill out this field');
+            input.removeClass('valid').addClass('invalid');
+            return false;
+        } else if (!emailRegex.test(value)) {
+            messageElement.text('Please include an \'@\' in the email address');
+            input.removeClass('valid').addClass('invalid');
+            return false;
+        } else {
+            messageElement.text('');
+            input.removeClass('invalid').addClass('valid');
+            return true;
+        }
+    }
+
+    // Attach validation to input events
+    $('#fname, #lname').on('input', function() {
+        validateName($(this));
+    });
+
+    $('#mname').on('input', function() {
+        if ($(this).val() !== '') {
+            validateName($(this));
+        } else {
+            $(this).siblings('.form-message').text('');
+            $(this).removeClass('valid invalid');
+        }
+    });
+
+    $('#email').on('input', function() {
+        validateEmail($(this));
+    });
+
+    // Add blur event for empty field validation
+    $('input[required]').on('blur', function() {
+        if ($(this).val() === '') {
+            $(this).addClass('invalid');
+            $(this).siblings('.form-message').text('Please fill out this field.');
+        }
+    });
+});
 </script>
 <script>
     document.addEventListener('contextmenu', function (event) {
         event.preventDefault();
     });
+</script>
+<script>
+// Eye tracking animation
+document.addEventListener('mousemove', function(event) {
+    const eyes = document.querySelectorAll('.eye-ball');
+    eyes.forEach(function(eye) {
+        const rect = eye.parentElement.getBoundingClientRect(); // Get eye-white boundaries
+        const eyeCenterX = rect.left + (rect.width / 2);
+        const eyeCenterY = rect.top + (rect.height / 2);
+        
+        const angle = Math.atan2(event.clientY - eyeCenterY, event.clientX - eyeCenterX);
+        const distance = Math.min(rect.width / 4, 10); // Limit movement radius
+        const moveX = Math.cos(angle) * distance;
+        const moveY = Math.sin(angle) * distance;
+        
+        eye.style.transform = `translate(calc(-50% + ${moveX}px), calc(-50% + ${moveY}px))`;
+    });
+});
 </script>
 </html>

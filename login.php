@@ -115,222 +115,193 @@ if (isset($_POST['submit'])) {
      <!-- Include SweetAlert library -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<style type="text/css">
-    .jeep img{
-        width: 20%;
-        top: 0;
-        z-index: 100%;
-        filter: drop-shadow();
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+    body {
+        background: linear-gradient(135deg, #24243e, #302b63, #0f0c29);
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        overflow: hidden;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
     }
+
     .jeep {
         position: relative;
+        width: 300px;
+        margin: 0 auto;
+        transform: translateY(30px);
     }
-    .eye-image{
-        margin-left: 40%;
+
+    .face img {
+        width: 100%;
+        height: auto;
+        filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.3));
+        transition: transform 0.3s ease;
     }
-    .eye-ball img{
-        
+
+    .eye-white {
         position: absolute;
-        top: -10px;
-        
-        margin-left: 40%;
-         z-index: 100%;
+        width: 60px;
+        height: 60px;
+        background: #fff;
+        border-radius: 50%;
+        top: 43%;
+        left: 27%;
+        transform: translateY(-50%);
+        box-shadow: 
+            inset 0 0 10px rgba(0,0,0,0.2),
+            inset 2px 2px 4px rgba(0,0,0,0.3),
+            inset -2px -2px 4px rgba(255,255,255,0.8),
+            0 0 5px rgba(0,0,0,0.1);
+        overflow: hidden;
+        background: radial-gradient(
+            circle at 30% 30%,
+            #ffffff 0%,
+            #f0f0f0 50%,
+            #e0e0e0 100%
+        );
     }
 
-  @import url(https://fonts.googleapis.com/css?family=Dancing+Script|Roboto);
-*, *:after, *:before {
-  box-sizing: border-box;
-}
+    .eye-white.rgt {
+        left: 53%;
+    }
 
-body {
-  background:rgba(180.46, 179.70, 217.81, 0.37);
-  text-align: center;
-  font-family: 'Roboto', sans-serif;
-   overflow: hidden; 
-}
+    .eye-ball {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background: #000;
+        border-radius: 50%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        transition: all 0.1s ease;
+    }
 
-.jeep{
-  position: relative;
-  width: 200px;
-  margin: 50px auto;
-  top: -100px;
-}
+    form {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 40px;
+        padding-right: 60px;
+        border-radius: 20px;
+        width: 320px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        transform: translateY(-30px);
+    }
 
-.face img{
-  width: 300px;
-  height: 300px;
-  margin: 50px auto;
-  left: -25%;
-  z-index: 50;
-  position: relative;
-}
+    h1 {
+        color: #fff;
+        font-size: 28px;
+        margin-bottom: 30px;
+        text-align: center;
+        font-weight: 600;
+        margin-left: 15px;
+    }
 
-.ear, .ear:after {
-  position: absolute;
-  width: 80px;
-  height: 80px;
-  background: #000;
-  z-index: 5;
-  border: 10px solid #fff;
-  left: -15px;
-  top: -15px;
-  border-radius: 100%;
-}
-.ear:after {
-  content: '';
-  left: 125px;
-}
+    .form-group {
+        margin-bottom: 25px;
+        position: relative;
+    }
 
-.eye-shade {
-  background: #000;
-  width: 50px;
-  height: 80px;
-  margin: 10px;
-  position: absolute;
-  top: 35px;
-  left: 25px;
-  transform: rotate(220deg);
-  border-radius: 25px/20px 30px 35px 40px;
-}
-.eye-shade.rgt {
-  transform: rotate(140deg);
-  left: 105px;
-}
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        color: #fff;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
 
-.eye-white {
-  position: absolute;
-  width: 50px;
-  height: 50px;
-  border-radius: 100%;
-  
-  z-index: 500;
-  left: 35px;
-  top: 160px;
-  overflow: hidden;
-}
-.eye-white.rgt {
-  right: 35px;
-  left: auto;
-}
+    .form-control:focus {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.3);
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        outline: none;
+    }
 
-.eye-ball {
-  position: absolute;
-  width: 0px;
-  height: 0px;
-  left: 30px;
-  top: 30px;
-  max-width: 30px;
-  max-height: 30px;
-  transition: 0.1s;
-}
-.eye-ball:after {
-  content: '';
-  background: #000;
-  position: absolute;
-  border-radius: 100%;
-  right: 0;
-  bottom: 0px;
-  width: 20px;
-  height: 20px;
-}
+    .form-label {
+        position: absolute;
+        left: 15px;
+        top: -10px;
+        background: rgba(17, 16, 29, 0.95);
+        padding: 0 5px;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 12px;
+        border-radius: 5px;
+    }
 
+    .btn {
+        background: linear-gradient(45deg, #4776E6, #8E54E9);
+        color: #fff;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 10px;
+        cursor: pointer;
+        width: 100%;
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+        margin-left: 15px;
+    }
 
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(71, 118, 230, 0.3);
+    }
 
-form {
-  display: none;
-  max-width: 400px;
-  padding: 20px 40px;
-  background: #fff;
-  height: 350px;
-  margin: auto;
-  display: block;
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
-  transition: 0.3s;
-  position: relative;
-  transform: translateY(-250px);
-  z-index: 500;
-  border: 1px solid #eee;
-  border-radius: 20px;
-}
-form.up {
-  transform: translateY(-380px);
-}
+    .signup-link {
+        text-align: center;
+        margin-top: 20px;
+        margin-left: 15px;
+    }
 
-h1 {
-  color: #02007B;
-  font-family: sans-serif;
-}
+    .signup-link a {
+        color: #fff;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
 
-.btn {
-  background: #fff;
-  padding: 5px;
-  width: 150px;
-  height: 35px;
-  border: 1px solid #02007B;
-  margin-top: 25px;
-  cursor: pointer;
-  transition: 0.3s;
-  box-shadow: 0 50px #02007B inset;
-  color: #fff;
-}
-.btn:hover {
-  box-shadow: 0 0 #02007B inset;
-  color: #02007B;
-}
-.btn:focus {
-  outline: none;
-}
+    .signup-link a:hover {
+        color: #4776E6;
+    }
 
-.form-group {
-  position: relative;
-  font-size: 15px;
-  color: #02007B;
-}
-.form-group + .form-group {
-  margin-top: 30px;
-}
-.form-group .form-label {
-  position: absolute;
-  z-index: 1;
-  left: 0;
-  top: 5px;
-  transition: 0.3s;
-}
-.form-group .form-control {
-  width: 100%;
-  position: relative;
-  z-index: 3;
-  height: 35px;
-  background: none;
-  border: none;
-  padding: 5px 0;
-  transition: 0.3s;
-  border-bottom: 1px solid #777;
-  color: #555;
-}
-.form-group .form-control:invalid {
-  outline: none;
-}
-.form-group .form-control:focus, .form-group .form-control:valid {
-  outline: none;
-  box-shadow: 0 1px #02007B;
-  border-color: #02007B;
-}
-.form-group .form-control:focus + .form-label, .form-group .form-control:valid + .form-label {
-  font-size: 12px;
-  color: #02007B;
-  transform: translateY(-15px);
-}
-.wrong-entry {
-  -webkit-animation: wrong-log 0.3s;
-  animation: wrong-log 0.3s;
-}
-.wrong-entry .alert {
-  opacity: 1;
-  transform: scale(1, 1);
-}
+    /* Animation for form movement */
+    form.up {
+        transform: translateY(-50px);
+    }
 
+    /* Floating animation for jeepney */
+    @keyframes float {
+        0%, 100% { transform: translateY(30px); }
+        50% { transform: translateY(20px); }
+    }
 
+    .jeep {
+        animation: float 3s ease-in-out infinite;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 480px) {
+        form {
+            width: 280px;
+            padding: 30px;
+        }
+
+        .jeep {
+            width: 250px;
+        }
+    }
 </style>
 <body>
   
@@ -350,22 +321,19 @@ h1 {
   </div>
 </div>
 <form action="" method="post">
-  <div class="hand"></div>
-  <div class="hand rgt"></div>
-  <h1>Login</h1>
-  <div class="form-group">
-    <input type="text" name="email" required="required" class="form-control"/>
-    <label class="form-label">Email</label>
-  </div>
-  <div class="form-group">
-    <input id="password" type="password" name="password" required="required" class="form-control"/>
-    <label class="form-label">Password</label>
+    <h1>Welcome Back</h1>
+    <div class="form-group">
+        <input type="text" name="email" required="required" class="form-control" placeholder="Enter your email"/>
+        <label class="form-label">Email</label>
+    </div>
+    <div class="form-group">
+        <input id="password" type="password" name="password" required="required" class="form-control" placeholder="Enter your password"/>
+        <label class="form-label">Password</label>
+    </div>
     <button class="btn" type="submit" name="submit">Login</button>
-  </div>
-  <div class="form-group">
-    <b><a href="signup.php" style="text-decoration: none; color: #02007B;">Sign Up</a></b>
-  </div>
-
+    <div class="signup-link">
+        <a href="signup.php">Don't have an account? Sign Up</a>
+    </div>
 </form>
 <!-- partial -->
   <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
@@ -456,5 +424,22 @@ $(document).on( "mousemove", function( event ) {
         event.preventDefault();
     });
 </script>
-
+<script>
+// Eye tracking animation
+document.addEventListener('mousemove', function(event) {
+    const eyes = document.querySelectorAll('.eye-ball');
+    eyes.forEach(function(eye) {
+        const rect = eye.getBoundingClientRect();
+        const eyeCenterX = rect.left + (rect.width / 2);
+        const eyeCenterY = rect.top + (rect.height / 2);
+        
+        const angle = Math.atan2(event.clientY - eyeCenterY, event.clientX - eyeCenterX);
+        const distance = 5;
+        const moveX = Math.cos(angle) * distance;
+        const moveY = Math.sin(angle) * distance;
+        
+        eye.style.transform = `translate(${moveX}px, ${moveY}px)`;
+    });
+});
+</script>
 </html>

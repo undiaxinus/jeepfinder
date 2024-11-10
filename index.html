@@ -5,109 +5,197 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SABAT MO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
     <style>
         body {
-            background: #4776E6;
-            background: -webkit-linear-gradient(to right, #8E54E9, #4776E6);
-            background: linear-gradient(to right, #8E54E9, #4776E6);
+            background: #000000;
+            background: radial-gradient(circle at center, #1a1a3a, #000000);
             overflow: hidden;
             margin: 0;
             font-family: 'Poppins', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+            position: relative;
         }
 
         img {
-            width: 180px;
-            height: 180px;
-            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+            width: 220px;
+            height: 220px;
+            filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.4));
+            margin-bottom: 40px;
         }
 
         @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0); }
-            50% { transform: translateY(-20px) rotate(3deg); }
+            0%, 100% { 
+                transform: translateY(0) rotate(0);
+                filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.4));
+            }
+            50% { 
+                transform: translateY(-20px) rotate(3deg);
+                filter: drop-shadow(0 0 30px rgba(0, 255, 255, 0.6));
+            }
         }
 
         #jeepney-container {
             position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        }
+
+        #jeepney-container:after {
+            content: '';
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 160px;
+            height: 20px;
+            background: radial-gradient(ellipse at center, rgba(0, 255, 255, 0.3) 0%, transparent 70%);
+            filter: blur(5px);
+            animation: shadow 3s ease-in-out infinite;
+        }
+
+        @keyframes shadow {
+            0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.3; }
+            50% { transform: translateX(-50%) scale(0.8); opacity: 0.1; }
         }
 
         #jeepney-container img {
             animation: float 3s ease-in-out infinite;
         }
 
+        .loading-text {
+            color: #00fff2;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            letter-spacing: 4px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px rgba(0, 255, 255, 0.5); }
+            to { text-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 30px rgba(0, 255, 255, 0.6); }
+        }
+
+        .progress-container {
+            width: 300px;
+            position: relative;
+            background: rgba(0, 255, 255, 0.1);
+            padding: 5px;
+            border-radius: 30px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
         #progress-bar {
-            position: absolute;
-            bottom: 25%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 200px;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+            height: 10px;
+            border-radius: 30px;
+            background: rgba(0, 0, 0, 0.4);
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
         }
 
         #progress {
             height: 100%;
-            background: linear-gradient(90deg, #00ff87 0%, #60efff 100%);
-            border-radius: 10px;
-            transition: width 0.2s ease;
-            animation: glow 1.5s ease-in-out infinite alternate;
+            background: linear-gradient(90deg, #00fff2, #00ffaa);
+            border-radius: 30px;
+            position: relative;
+            transition: width 0.3s ease;
         }
 
-        @keyframes glow {
-            from {
-                box-shadow: 0 0 5px rgba(96, 239, 255, 0.5);
-            }
-            to {
-                box-shadow: 0 0 20px rgba(96, 239, 255, 0.8);
-            }
+        #progress:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.4) 50%,
+                transparent 100%
+            );
+            animation: wave 2s linear infinite;
+        }
+
+        @keyframes wave {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         #progress-count {
             position: absolute;
-            bottom: 18%;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
-            font-size: 16px;
+            transform: translate(-50%, -50%);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
             font-weight: 500;
-            color: white;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            color: #00fff2;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            white-space: nowrap;
+            z-index: 1;
+            letter-spacing: 2px;
+        }
+
+        /* Hexagon background effect */
+        .hexagon-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, transparent 95%, rgba(0, 255, 255, 0.1) 100%),
+                linear-gradient(0deg, transparent 95%, rgba(0, 255, 255, 0.1) 100%);
+            background-size: 30px 30px;
+            opacity: 0.3;
+            pointer-events: none;
         }
 
         @media only screen and (max-width: 768px) {
             img {
-                width: 150px;
-                height: 150px;
+                width: 180px;
+                height: 180px;
             }
 
-            #progress-bar {
-                width: 160px;
-                bottom: 30%;
+            .loading-text {
+                font-size: 26px;
             }
 
-            #progress-count {
-                bottom: 23%;
+            .progress-container {
+                width: 260px;
             }
         }
     </style>
 </head>
 <body>
-    <div id="jeepney-container">
-        <img src="img/loader.png" alt="Animated jeepney">
-    </div>
-    <div id="progress-bar">
-        <div id="progress"></div>
-        <div id="progress-count">
-            <b>Loading... 0%</b>
+    <div class="hexagon-bg"></div>
+    <div class="container">
+        <div id="jeepney-container">
+            <img src="img/loader.png" alt="Animated jeepney">
+        </div>
+        <div class="loading-text">SABAT MO</div>
+        <div class="progress-container">
+            <div id="progress-bar">
+                <div id="progress"></div>
+            </div>
+            <div id="progress-count">
+                <b>LOADING 0%</b>
+            </div>
         </div>
     </div>
-    
 
     <script>
         function updateProgress() {
@@ -118,21 +206,19 @@
             const interval = setInterval(() => {
                 if (progress >= 100) {
                     clearInterval(interval);
-                    progressCount.innerHTML = '<b>Complete!</b>';
+                    progressCount.innerHTML = '<b>WELCOME</b>';
                     setTimeout(() => {
                         window.location.href = 'login.php';
-                    }, 500);
+                    }, 800);
                 } else {
                     progress += 1;
                     progressBar.style.width = `${progress}%`;
-                    progressCount.innerHTML = `<b>Loading... ${progress}%</b>`;
+                    progressCount.innerHTML = `<b>LOADING ${progress}%</b>`;
                 }
             }, 30);
         }
 
-        // Start the progress animation when the page loads
         document.addEventListener('DOMContentLoaded', updateProgress);
     </script>
-
 </body>
 </html>
