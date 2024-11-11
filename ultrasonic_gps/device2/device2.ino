@@ -20,8 +20,7 @@ const int button2Pin = 4;
 
 // Define LoRa Addresses
 #define DEVICE_1_ADDRESS 0x01
-#define DEVICE_3_ADDRESS 0x03
-#define DEVICE_2_ADDRESS 0x03  // Device 2 should use DEVICE_3_ADDRESS
+#define DEVICE_2_ADDRESS 0x03  
 
 // Debounce variables
 unsigned long lastDebounceTime1 = 0;

@@ -24,7 +24,7 @@ const int batteryPin = 36;
 #define LORA_MOSI 23
 
 #define DEVICE_1_ADDRESS 0x01
-#define DEVICE_3_ADDRESS 0x03
+#define DEVICE_2_ADDRESS 0x03
 
 TinyGPSPlus gps;
 WiFiManager wifiManager; // Create an instance of WiFiManager
@@ -66,7 +66,7 @@ void loop() {
         int receiver = LoRa.read();  // Read the receiver address
         
         // Check if message is for this device AND from Device 2
-        if (receiver == DEVICE_1_ADDRESS && sender == DEVICE_3_ADDRESS) {
+        if (receiver == DEVICE_1_ADDRESS && sender == DEVICE_2_ADDRESS) {
             String message = "";
             while (LoRa.available()) {
                 message += (char)LoRa.read();
@@ -156,8 +156,8 @@ void loop() {
         previousMillis = currentMillis;
         // Update the database with Slot and bearing
         updateDatabase(DEVICE_1_ADDRESS, String(bearing));
-        // Send message to Device 2 (using DEVICE_3_ADDRESS)
-        sendLoRaMessage(DEVICE_3_ADDRESS, "DATA_FROM_DEVICE_1: Slot=" + String(Slot));
+        // Send message to Device 2 (using DEVICE_2_ADDRESS)
+        sendLoRaMessage(DEVICE_2_ADDRESS, "DATA_FROM_DEVICE_1: Slot=" + String(Slot));
         Serial.print("Sending data: Slot = ");
         Serial.println(Slot);
     }
@@ -193,7 +193,7 @@ int getDistance(int trigPin, int echoPin) {
 
 void updateDatabase(int id, const String& value) {
     if (WiFi.status() == WL_CONNECTED) { // Check if WiFi is connected
-        const char* serverUrl = "http://192.168.0.142/jeepfinder/location"; // Your server URL
+        const char* serverUrl = "http://192.168.43.100/jeepfinder/location"; // Your server URL
         String postData = "ID=" + String(id) + "&message=" + String(Slot) + "&lat=" + String(gps.location.lat(), 6) + "&lon=" + String(gps.location.lng(), 6) + "&rotation=" + String(bearing);
         if (gps.speed.isValid()) {
             postData += "&speed=" + String(gps.speed.kmph());
@@ -217,7 +217,7 @@ void updateDatabase(int id, const String& value) {
 void sendLoRaMessage(int receiverAddress, const String& message) {
     LoRa.beginPacket();
     LoRa.write(DEVICE_1_ADDRESS);    // Sender: Device 1 (0x01)
-    LoRa.write(DEVICE_3_ADDRESS);    // Receiver: Device 2 (0x03)
+    LoRa.write(DEVICE_2_ADDRESS);    // Receiver: Device 2 (0x03)
     LoRa.print(message);
     LoRa.endPacket();
     Serial.print("Sent message to Device 2: ");
