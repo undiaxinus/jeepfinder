@@ -51,36 +51,93 @@
   <style type="text/css">
    .home-section {
       display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      height: 100vh;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      padding-top: 0px;
+      position: relative;
+      z-index: 1;
+      margin-left: 0;
+      transition: all 0.5s ease;
+      overflow-x: hidden;
+      width: 100%;
+    
+    }
+    .home-section.active {
+      margin-left: 250px;
     }
     .chat{
-      margin-top: 20px;
-      margin-bottom: auto;
+      width: 100%;
+      max-width: 800px;
       
+      padding: 10px;
     }
     .card{
-      margin-bottom: 45px;
-      height: 600px;
+      height: calc(100vh - 200px);
       border-radius: 15px !important;
       background-color: rgba(0,0,0,0.4) !important;
+      display: flex;
+      flex-direction: column;
     }
     .contacts_body{
       padding:  0.75rem 0 !important;
-      overflow-y: auto;
+      overflow-x: auto;
+      overflow-y: hidden;
       white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      -ms-overflow-style: auto;
+    }
+    .contacts_body::-webkit-scrollbar {
+      height: 3px;
+      display: block;
+    }
+    .contacts_body::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+    }
+    .contacts_body::-webkit-scrollbar-thumb {
+      background: linear-gradient(to right, 
+        rgba(255, 255, 255, 0.2), 
+        rgba(255, 255, 255, 0.3)
+      );
+      border-radius: 20px;
+      transition: background 0.3s ease;
+    }
+    .contacts_body::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(to right, 
+        rgba(255, 255, 255, 0.3), 
+        rgba(255, 255, 255, 0.4)
+      );
     }
     .msg_card_body{
-      overflow-y: auto;
+      height: calc(100% - 120px);
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      padding: 15px;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+    .msg_card_body::-webkit-scrollbar {
+      width: 5px;
+    }
+    .msg_card_body::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .msg_card_body::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
     }
     .card-header{
       border-radius: 15px 15px 0 0 !important;
       border-bottom: 0 !important;
+      flex-shrink: 0;
     }
    .card-footer{
     border-radius: 0 0 15px 15px !important;
       border-top: 0 !important;
+      flex-shrink: 0;
+      padding: 10px;
   }
     .container{
       align-content: center;
@@ -123,13 +180,7 @@
     button p{
       height: 60px
     }
-    .search_btn{
-      border-radius: 0 15px 15px 0 !important;
-      background-color: rgba(0,0,0,0.3) !important;
-      border:0 !important;
-      color: white !important;
-      cursor: pointer;
-    }
+   
     .contacts{
       list-style: none;
       padding: 0;
@@ -137,7 +188,7 @@
     .contacts li{
       width: 100% !important;
       padding: 5px 10px;
-      margin-bottom: 15px !important;
+      margin-bottom: 5px !important;
     }
     .active{
       background-color: rgba(0,0,0,0.3);
@@ -234,7 +285,7 @@
       width: 100px;
     }
     .msg_head{
-      position: relative;
+     
     }
     .contacts li.contact-item {
       cursor: pointer; 
@@ -261,104 +312,309 @@
       from { opacity: 0; }
       to { opacity: 1; }
     }
+    
+    .contacts_card {
+      height: 100px !important;
+      padding: 3px 0;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .contacts {
+      display: inline-flex;
+      flex-direction: row;
+      gap: 15px;
+      padding: 0 10px;
+      margin: 0;
+      height: 100%;
+      align-items: center;
+    }
+
+    .contacts_body {
+      padding: 0 !important;
+      overflow-x: auto;
+      overflow-y: hidden;
+      white-space: nowrap;
+      height: 100%;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .contacts_body::-webkit-scrollbar {
+      height: 5px;
+    }
+
+    .contacts_body::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .contacts_body::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+    }
+
+    .contacts li {
+      width: auto !important;
+      padding: 5px;
+      margin-bottom: 5px !important;
+      text-align: center;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .img_cont {
+      position: relative;
+      height: 50px;
+      width: 50px;
+      margin: 0 auto;
+    }
+
+    .user_info {
+      margin-top: 5px;
+      text-align: center;
+      margin-left: 0;
+      white-space: normal;
+    }
+
+    .user_info span {
+      font-size: 12px;
+      display: block;
+    }
+
+    .user_info p {
+      display: none; /* Hide status text since we're using icons */
+    }
+
+    .online_icon,
+    .online_icons {
+      bottom: 0;
+      right: 0;
+    }
+
+    /* Adjust contact item layout */
+    .contact-item .d-flex {
+      flex-direction: column;
+      align-items: center;
+      width: 70px;
+    }
     @media only screen and (max-width: 720px) {
       .chat{
-        margin-top: 10px;
-        height: 700px;
+        width: 95%;
+       
       }
       .card{
-        width: 360px;
-        margin-left: -15px;
-      }
-      .card-footer{
-        margin-bottom: 35px;
+        width: 100%;
+        margin-left: 0;
       }
       .contacts_card {
-    display: block;
-  }
-  #conversation-card {
-    display: none; 
-  }
+        height: 180px;
+        display: block;
+      }
+      .home-section {
+        padding-top: 0px;
+        margin-left: 0;
+        width: 100%;
+      }
+      .home-section.active {
+        margin-left: 0;
+      }
+    }
+    .container-fluid {
+      margin-left: 100px;
+      transition: all 0.5s ease;
+    }
+    .home-section.active .container-fluid {
+      margin-left: 0;
+    }
+    @media only screen and (max-width: 720px) {
+      .container-fluid {
+        margin-left: 0;
+      }
+    }
+    .msg_cotainer, 
+    .msg_cotainer_send {
+      max-width: 80%;
+      word-wrap: break-word;
+    }
+    @media only screen and (max-width: 720px) {
+      form{
+        margin-bottom: 50px;
+      }
+      .chat {
+        width: 100%;  /* Changed from 95% */
+        margin: 0;    /* Changed from 10px auto */
+        padding: 0px; /* Reduced padding */
+      }
+
+      .card {
+        height: calc(100vh - 80px); /* Reduced from 100px to show more content */
+        margin: 0;
+        border-radius: 0 !important; /* Remove border radius on mobile */
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .contacts_card {
+        height: 100px !important; /* Keep consistent height */
+        margin-bottom: 10px;
+      }
+
+      .home-section {
+        padding: 0;
+        padding-top: 50px; /* Reduced top padding */
+        width: 100%;
+        top: 0px;
+        margin-top: 0px;
+        padding-top: 0px;
+      }
+
+      .container-fluid {
+        padding: 0; /* Remove padding */
+        margin: 0;  /* Remove margin */
+      }
+
+      /* Adjust message containers for mobile */
+      .msg_cotainer, 
+      .msg_cotainer_send {
+        max-width: 85%; /* Slightly wider messages */
+        padding: 8px;   /* Reduced padding */
+      }
+
+      /* Adjust input area for mobile */
+      .card-footer {
+        padding: 5px;
+        position: relative;
+        bottom: 0;
+        width: 100%;
+        background-color: rgba(0,0,0,0.4);
+      }
+
+      .type_msg {
+        height: 40px !important; /* Slightly reduced height */
+      }
+
+      .send_btn p {
+        height: 40px; /* Match input height */
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .input-group {
+        margin: 0;
+        height: 40px;
+      }
+
+      /* Adjust contact items for mobile */
+      .contacts li {
+        padding: 3px;
+      }
+
+      .img_cont {
+        height: 40px;  /* Smaller images */
+        width: 40px;
+      }
+
+      .user_img {
+        height: 40px;
+        width: 40px;
+      }
+
+      .user_info span {
+        font-size: 11px; /* Smaller font */
+      }
+
+      /* Adjust scrollbars for mobile */
+      .contacts_body::-webkit-scrollbar {
+        height: 3px;
+      }
+
+      .msg_card_body::-webkit-scrollbar {
+        width: 3px;
+      }
+    }
+
+    /* Additional adjustments for very small screens */
+    @media only screen and (max-width: 480px) {
+      
+      .card {
+        height: calc(100vh - 70px); /* Even smaller for very small screens */
+      }
+
+      .msg_card_body {
+        height: calc(100% - 90px);
+      }
     }
   </style>
   <body>
     <?php include 'navigation.php'; ?>
     <section class="home-section">
-      <div class="container-fluid h-100">
-        <div class="row justify-content-center h-100">
-  <!--contact-->
-          <div class="col-md-4 col-xl-3 chat">
-            <div class="card mb-sm-3 mb-md-0 contacts_card">
-              <div class="card-header">
-                <div class="input-group">
-                  <input type="text" placeholder="Search..." class="form-control search">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text search_btn"><i class="fas fa-search"></i></span>
-                  </div>
-                </div>
-              </div>
-              <div class="card-body contacts_body">
-                <ul class="contacts">
-                  <?php foreach ($contact as $c): ?>
-                    <li class="contact-item" 
-                      data-id="<?php echo $c['id']; ?>" 
-                      data-fullname="<?php echo htmlspecialchars($c['fname'] . ' ' . $c['mname'] . ' ' . $c['lname']); ?>" 
-                      data-username="<?php echo htmlspecialchars($c['user']); ?>" 
-                      data-status="<?php echo htmlspecialchars($c['status']); ?>">
-                      <div class="d-flex bd-highlight">
-                        <div class="img_cont">
-                          <img src="../img/sbmo.png" class="rounded-circle user_img">
-                          <?php
-                            if($c['status'] == "online"){
-                              echo '<span class="online_icon"></span>';
-                            }else{
-                              echo '<span class="online_icons"></span>';
-                            }
-                          ?>
-                        </div>
-                        <div class="user_info">
-                          <span><?php echo htmlspecialchars($c['fname'] . ' ' . $c['mname'] . ' ' . $c['lname']); ?></span>
-                          <p><?php echo htmlspecialchars($c['status']); ?></p>
-                        </div>
+      <div class="container-fluid">
+        <!-- Contacts Section -->
+        <div class="chat">
+          <div class="card mb-sm-3 mb-md-0 contacts_card">
+            <div class="card-body contacts_body">
+              <ul class="contacts">
+                <?php foreach ($contact as $c): ?>
+                  <li class="contact-item" 
+                    data-id="<?php echo $c['id']; ?>" 
+                    data-fullname="<?php echo htmlspecialchars($c['fname'] . ' ' . $c['mname'] . ' ' . $c['lname']); ?>" 
+                    data-username="<?php echo htmlspecialchars($c['user']); ?>" 
+                    data-status="<?php echo htmlspecialchars($c['status']); ?>">
+                    <div class="d-flex bd-highlight">
+                      <div class="img_cont">
+                        <img src="../img/sbmo.png" class="rounded-circle user_img">
+                        <?php
+                          if($c['status'] == "online"){
+                            echo '<span class="online_icon"></span>';
+                          }else{
+                            echo '<span class="online_icons"></span>';
+                          }
+                        ?>
                       </div>
-                    </li>
-                  <?php endforeach; ?>
-                </ul>
-              </div>
-              <div class="card-footer"></div>
-            </div>
-          </div>
-                          <!--chatbox-->
-          <div class="col-md-8 col-xl-6 chat">
-            <div class="card" id="conversation-card" style="display: none;">
-              <div class="card-header msg_head">
-                <div class="d-flex bd-highlight">
-                  <div class="img_cont">
-                    <img src="../img/sbmo.png" class="rounded-circle user_img">
-                    <div id="status-name"></div>
-                  </div>
-                  <div class="user_info">
-                    <span id="receiver-name">Customer Service</span>
-                  </div>
-                </div>
-              </div>
-              <div class="card-body msg_card_body"></div>
-              <form method="post" action="">
-                <input type="hidden" name="sender_name" value="<?php echo htmlspecialchars($sender_id); ?>">
-                <input type="hidden" name="receiver_name" value="">
-                <div class="card-footer">
-                  <div class="input-group">
-                    <div class="input-group-append">
-                      <span class="input-group-text attach_btn"></span>
+                      <div class="user_info">
+                        <span><?php echo htmlspecialchars($c['fname']); ?></span>
+                      </div>
                     </div>
-                    <input name="message" class="form-control type_msg" placeholder="Type your message..." required>
-                    <button class="send_btn" type="submit" name="submit" >
-                      <p class="input-group-text send_btn">Send</p>
-                    </button>
-                  </div>
-                </div>
-              </form>
+                  </li>
+                <?php endforeach; ?>
+              </ul>
             </div>
+            
+          </div>
+        </div>
+        
+        <!-- Chatbox Section -->
+        <div class="chat">
+          <div class="card" id="conversation-card" style="display: none;">
+            <div class="card-header msg_head">
+              <!-- <div class="d-flex bd-highlight">
+                <div class="img_cont">
+                  <img src="../img/sbmo.png" class="rounded-circle user_img">
+                  <div id="status-name"></div>
+                </div>
+                <div class="user_info">
+                  <span id="receiver-name">Customer Service</span>
+                </div>
+              </div> -->
+            </div>
+            <div class="card-body msg_card_body"></div>
+            <form method="post" action="">
+              <input type="hidden" name="sender_name" value="<?php echo htmlspecialchars($sender_id); ?>">
+              <input type="hidden" name="receiver_name" value="">
+              <div class="card-footer">
+                <div class="input-group">
+                  <div class="input-group-append">
+                    <span class="input-group-text attach_btn"></span>
+                  </div>
+                  <input name="message" class="form-control type_msg" placeholder="Type your message..." required>
+                  <button class="send_btn" type="submit" name="submit" >
+                    <p class="input-group-text send_btn">Send</p>
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
       </div>
@@ -435,6 +691,19 @@
             }
           });
         }
+
+        // Add this new code for navigation toggle
+        let sidebar = document.querySelector(".sidebar");
+        let homeSection = document.querySelector(".home-section");
+        
+        $('.sidebarBtn').click(function() {
+          sidebar.classList.toggle("active");
+          if(sidebar.classList.contains("active")) {
+            homeSection.classList.add("active");
+          } else {
+            homeSection.classList.remove("active");
+          }
+        });
       });
       
     </script>
