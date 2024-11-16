@@ -71,7 +71,6 @@ $conn->close();
                 max-width: 100%;
             }
             .border {
-                margin-left: 90px;
                 display: grid;
                 grid-template-columns: repeat(4, 1fr);
                 gap: 20px;
@@ -635,6 +634,40 @@ $conn->close();
                 th, td {
                     padding: 10px;
                     font-size: 12px;
+                }
+            }
+
+            /* Mobile responsive styles */
+            @media (max-width: 768px) {
+                .border {
+                    grid-template-columns: repeat(2, 1fr); /* 2 columns for mobile */
+                    gap: 15px;
+                    padding: 15px;
+                }
+
+                .card {
+                    /* Adjust card sizes for mobile if needed */
+                    min-height: 150px;
+                }
+
+                .card i {
+                    font-size: 36px; /* Slightly smaller icons for mobile */
+                }
+
+                .card h2 {
+                    font-size: 20px; /* Smaller heading for mobile */
+                }
+
+                .card p {
+                    font-size: 12px; /* Smaller text for mobile */
+                }
+            }
+
+            /* For very small screens */
+            @media (max-width: 480px) {
+                .border {
+                    gap: 10px;
+                    padding: 10px;
                 }
             }
         </style>

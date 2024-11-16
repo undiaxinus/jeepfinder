@@ -629,6 +629,41 @@
                     font-size: 12px;
                 }
             }
+
+            /* Mobile responsive styles */
+            @media (max-width: 768px) {
+                .border {
+                    margin-left: 0; /* Remove left margin on mobile */
+                    grid-template-columns: repeat(2, 1fr); /* 2 columns for mobile */
+                    gap: 15px;
+                    padding: 15px;
+                }
+
+                .card {
+                    padding: 15px;
+                }
+
+                .card i {
+                    font-size: 36px;
+                }
+
+                .card h2 {
+                    font-size: 18px;
+                    margin: 8px 0;
+                }
+
+                .card p {
+                    font-size: 12px;
+                }
+            }
+
+            /* Very small screens */
+            @media (max-width: 480px) {
+                .border {
+                    gap: 10px;
+                    padding: 10px;
+                }
+            }
         </style>
     </head>
     <body>
