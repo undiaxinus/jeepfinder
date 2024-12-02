@@ -145,10 +145,39 @@ if (navigator.geolocation) {
     }, function (error) {
         console.error('Error getting user location:', error);
         map.setView([13.16472023105074, 123.75132122380849], 17); // Default location
+        
+        // Add SweetAlert2 popup for location error
+        Swal.fire({
+            title: 'Location Services Disabled',
+            text: 'Please enable location services to use all features of this app.',
+            icon: 'warning',
+            confirmButtonText: 'Open Settings',
+            showCancelButton: true,
+            cancelButtonText: 'Continue without location',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Open device location settings
+                if (/(android)/i.test(navigator.userAgent)) {
+                    window.location.href = 'intent://settings/location#Intent;scheme=android-app;end';
+                } else if (/(iphone|ipad|ipod)/i.test(navigator.userAgent)) {
+                    window.location.href = 'App-Prefs:Privacy&path=LOCATION';
+                } else {
+                    window.location.href = 'chrome://settings/content/location';
+                }
+            }
+        });
     });
 } else {
     console.error('Geolocation is not supported by this browser.');
     map.setView([13.16472023105074, 123.75132122380849], 17); // Default location
+    
+    // Add SweetAlert2 popup for browser compatibility
+    Swal.fire({
+        title: 'Location Not Supported',
+        text: 'Your browser does not support location services. Please use a modern browser.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+    });
 }
 
 // Define tile layers

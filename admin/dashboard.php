@@ -71,6 +71,7 @@ $conn->close();
                 max-width: 100%;
             }
             .border {
+                margin-left: 90px;
                 display: grid;
                 grid-template-columns: repeat(4, 1fr);
                 gap: 20px;
@@ -640,30 +641,31 @@ $conn->close();
             /* Mobile responsive styles */
             @media (max-width: 768px) {
                 .border {
+                    margin-left: 0; /* Remove left margin on mobile */
                     grid-template-columns: repeat(2, 1fr); /* 2 columns for mobile */
                     gap: 15px;
                     padding: 15px;
                 }
 
                 .card {
-                    /* Adjust card sizes for mobile if needed */
-                    min-height: 150px;
+                    padding: 15px;
                 }
 
                 .card i {
-                    font-size: 36px; /* Slightly smaller icons for mobile */
+                    font-size: 36px;
                 }
 
                 .card h2 {
-                    font-size: 20px; /* Smaller heading for mobile */
+                    font-size: 18px;
+                    margin: 8px 0;
                 }
 
                 .card p {
-                    font-size: 12px; /* Smaller text for mobile */
+                    font-size: 12px;
                 }
             }
 
-            /* For very small screens */
+            /* Very small screens */
             @media (max-width: 480px) {
                 .border {
                     gap: 10px;
@@ -675,7 +677,7 @@ $conn->close();
     <body>
         <?php include "navigation.php" ?>
         <section class="home-section">
-            <div class="border">
+        <div class="border">
                 <!-- Card 1 -->
                 <a href="users.php?id=<?php echo $id ?>">
                     <div class="card blue">

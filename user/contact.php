@@ -9,16 +9,21 @@
   $sender_id = isset($_GET['id']) ? $_GET['id'] : null;
   date_default_timezone_set('Asia/Manila'); 
   $insertSuccess = false;
-  if (isset($_POST['submit'])) {
+ if (isset($_POST['submit'])) {
     $receiver_name = $_POST['receiver_name'];
     $message = $_POST['message'];
     $timestamp = date('Y-m-d H:i:s');
     $mstatus = "unread";
-    $sql = "INSERT INTO message (sender_name, receiver_name, message,message_status, timestamp) VALUES ('$sender_id','$receiver_name','$message', '$mstatus', '$timestamp')";
+    $sql = "INSERT INTO message (sender_name, receiver_name, message, message_status, timestamp) VALUES ('$sender_id','$receiver_name','$message', '$mstatus', '$timestamp')";
     if ($conn->query($sql) === TRUE) {
-        $insertSuccess = true;
+      $insertSuccess = true;
+      
+      // Update unread messages to read for the sender
+      $updateSql = "UPDATE message SET message_status = 'read' WHERE receiver_name = '$sender_id' AND message_status = 'unread'";
+      $conn->query($updateSql);
+      
     } else {
-        echo "Error: " . $sql . "<br>" . $conn->error;
+      echo "Error: " . $sql . "<br>" . $conn->error;
     }
   }
   $sql = "SELECT * FROM user WHERE account ='admin' ";
@@ -36,6 +41,16 @@
     while ($msgRow = $messageResult->fetch_assoc()) {
       $messages[] = $msgRow;
     }
+  }
+  function getUnreadMessageCount($username) {
+    global $conn;
+    $sql = "SELECT COUNT(*) as unread_count FROM message WHERE sender_name = ? AND message_status = 'unread'";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $data = $result->fetch_assoc();
+    return $data['unread_count'];
   }
 ?>
 <!DOCTYPE html>
@@ -216,23 +231,31 @@
     }
     .online_icon{
       position: absolute;
-      height: 15px;
-      width:15px;
+      height: 20px;
+      width:20px;
       background-color: #4cd137;
       border-radius: 50%;
       bottom: 1.5em;
       right: 1em;
       border:1.5px solid white;
+      color:black;
+      font-size: 10px;
+      justify-content: center;
+      align-items: center;
     }
     .online_icons {
       position: absolute;
-      height: 15px;
-      width:15px;
+      height: 20px;
+      width:20px;
       background-color: #c23616;
       border-radius: 50%;
       bottom: 1.5em;
       right: 1em;
       border:1.5px solid white;
+      color:white;
+      font-size: 10px;
+      justify-content: center;
+      align-items: center;
     }
     .offline{
       background-color: #c23616 !important;
@@ -291,10 +314,10 @@
       cursor: pointer; 
     }
     .contacts li.contact-item:hover {
-      background-color: rgba(0, 0, 0, 0.2);
+      background-color: rgba(255, 255, 255, 0.1);
     }
     .contact-item.active {
-      background-color: rgba(0, 0, 0, 0.2);
+      background-color: rgba(255, 255, 255, 0.1);
     }
     .notification {
       position: fixed;
@@ -567,9 +590,9 @@
                         <img src="../img/sbmo.png" class="rounded-circle user_img">
                         <?php
                           if($c['status'] == "online"){
-                            echo '<span class="online_icon"></span>';
+                            echo '<span class="online_icon"><b>'.getUnreadMessageCount($c['user']).'</b></span>';
                           }else{
-                            echo '<span class="online_icons"></span>';
+                            echo '<span class="online_icons"><b>'.getUnreadMessageCount($c['user']).'</b></span>';
                           }
                         ?>
                       </div>

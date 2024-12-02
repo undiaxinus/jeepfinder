@@ -8,7 +8,7 @@ $message = $_POST['message']; // Assuming the message is sent from Arduino
 $latitude = $_POST['lat'];
 $longitude = $_POST['lon'];
 $speed = $_POST['speed'];
-$bearing = $_POST['bearing']; // Assuming the bearing is sent from Arduino
+$bearing = $_POST['rotation']; // Assuming the bearing is sent from Arduino
 
 // Update MySQL database
 $sql = "UPDATE locate SET passenger = '$message', latitude = '$latitude', longitude = '$longitude', speed = '$speed', rotation = '$bearing', resdate = NOW()  WHERE ID = '$id'";

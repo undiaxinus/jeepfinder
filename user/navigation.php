@@ -449,8 +449,9 @@ if (!$row) {
        <a href="contact.php?id=<?php echo $id ?>">
          <i class='bx bx-envelope'></i>
          <span class="links_name">Message</span>
+         <span class="mail-badge" style="display: none; background-color: red; color: white; border-radius: 50%;width: 20px; height: 20px; margin-top: 5px; margin-right: 1px; padding-left: 8px; justify-content: center; align-items: center; font-size: 12px; position: absolute; top: 0; right: 0;">0</span>
        </a>
-       <span class="tooltip">Contact Us</span>
+       <span class="tooltip">Message</span>
      </li>
   
      <li>
@@ -499,5 +500,27 @@ if (!$row) {
         event.preventDefault();
     });
 </script>
+<script>
+      function fetchUnreadMessages() {
+        const userId = '<?php echo $id; ?>'; // Get the user ID from PHP
+        fetch(`fetch_unread_messages.php?id=${userId}`)
+          .then(response => response.json())
+          .then(data => {
+            const unreadCount = data.unread_count;
+            const badge = document.querySelector('.mail-badge');
+            if (unreadCount > 0) {
+              badge.textContent = unreadCount;
+              badge.style.display = 'inline-block';
+            } else {
+              badge.style.display = 'none';
+            }
+          })
+          .catch(error => console.error('Error fetching unread messages:', error));
+      }
+
+      // Fetch unread messages every 1 seconds
+      setInterval(fetchUnreadMessages, 1000);
+      fetchUnreadMessages(); // Initial fetch
+    </script>
 </body>
 </html>

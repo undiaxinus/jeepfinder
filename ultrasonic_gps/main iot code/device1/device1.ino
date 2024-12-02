@@ -35,6 +35,20 @@ bool leftDetected = false;
 bool rightDetected = false;
 float bearing = 0; // Bearing variable to store GPS heading in degrees
 
+unsigned long previousGPSMillis = 0; // Variable to store the last time GPS was checked
+const long gpsInterval = 1000; // 1 second in milliseconds
+
+// Declare variables to store previous GPS data
+float previousLat = 0.0;
+float previousLng = 0.0;
+float previousSpeed = 0.0;
+float previousBearing = 0.0;
+
+unsigned long previousHTTPMillis = 0;
+const long httpInterval = 30000; // 30 seconds in milliseconds
+
+float lastValidBearing = 0.0;
+
 void setup() {
     Serial.begin(9600);
     Serial2.begin(9600, SERIAL_8N1, gpsRxPin, gpsTxPin);
@@ -79,7 +93,14 @@ void loop() {
                     Slot--;
                     Serial.println("Button 1 pressed: Decrement Slot");
                     triggerBuzzer();
+                    if (Slot == 0) {
+                        // Update database and send LoRa message when Slot becomes 0
+                        updateDatabase(DEVICE_1_ADDRESS, String(bearing));
+                        sendLoRaMessage(DEVICE_2_ADDRESS, "DATA_FROM_DEVICE_1: Slot=0");
+                        Serial.println("Slot is now 0");
+                    }
                 } else {
+                    Slot = 0;
                     Serial.println("Cannot decrement Slot, it's already 0");
                 }
             } else if (message == "BUTTON2_PRESSED") {
@@ -94,29 +115,67 @@ void loop() {
     float voltage = (rawValue / 4095.0) * 3.3 * 2;
     int batteryPercent = calculateBatteryPercentage(voltage);
 
-    delay(100);
+    delay(50);
 
     int distance1 = getDistance(trigPin1, echoPin1);
     int distance2 = getDistance(trigPin2, echoPin2);
 
-    while (Serial2.available() > 0) {
-        if (gps.encode(Serial2.read())) {
-            if (gps.location.isValid()) {
-                Serial.print("Latitude: ");
-                Serial.println(gps.location.lat(), 6);
-                Serial.print("Longitude: ");
-                Serial.println(gps.location.lng(), 6);
-            }
-            if (gps.speed.isValid()) {
-                Serial.print("Speed: ");
-                Serial.print(gps.speed.kmph());
-                Serial.println(" kmph");
-                // Update bearing with GPS course (heading in degrees)
-                bearing = gps.course.deg(); // Get bearing (heading) in degrees
-                Serial.print("Bearing: ");
-                Serial.println(bearing); // Print bearing value
+    unsigned long currentMillis = millis();
+    
+    // Check GPS data every 20 seconds
+    if (currentMillis - previousGPSMillis >= gpsInterval) {
+        previousGPSMillis = currentMillis;
+        
+        while (Serial2.available() > 0) {
+            if (gps.encode(Serial2.read())) {
+                bool dataChanged = false;
+                
+                if (gps.location.isValid()) {
+                    float currentLat = gps.location.lat();
+                    float currentLng = gps.location.lng();
+                    if (currentLat != previousLat || currentLng != previousLng) {
+                        Serial.print("Latitude: ");
+                        Serial.println(currentLat, 6);
+                        Serial.print("Longitude: ");
+                        Serial.println(currentLng, 6);
+                        previousLat = currentLat;
+                        previousLng = currentLng;
+                        dataChanged = true;
+                    }
+                }
+                if (gps.speed.isValid()) {
+                    float currentSpeed = gps.speed.kmph();
+                    if (currentSpeed != previousSpeed) {
+                        Serial.print("Speed: ");
+                        Serial.print(currentSpeed);
+                        Serial.println(" kmph");
+                        previousSpeed = currentSpeed;
+                        dataChanged = true;
+                    }
+                }
+                if (gps.course.isValid()) {
+                    float currentBearing = gps.course.deg();
+                    if (currentBearing != previousBearing) {
+                        Serial.print("Bearing: ");
+                        Serial.println(currentBearing);
+                        previousBearing = currentBearing;
+                        lastValidBearing = currentBearing; // Update last valid bearing
+                        dataChanged = true;
+                    }
+                }
+
+                // Send HTTP request if data has changed
+                if (dataChanged) {
+                    updateDatabase(DEVICE_1_ADDRESS, String(lastValidBearing));
+                }
             }
         }
+    }
+
+    // Send HTTP request at regular intervals
+    if (currentMillis - previousHTTPMillis >= httpInterval) {
+        previousHTTPMillis = currentMillis;
+        updateDatabase(DEVICE_1_ADDRESS, String(lastValidBearing));
     }
 
     // Check ultrasonic sensor distances and update Slot
@@ -134,13 +193,22 @@ void loop() {
     } else if (distance2 < 30) {
         // Right sensor detects a passenger
         if (!rightDetected) {
-            if (Slot > 0) { // Check if Slot is greater than 0
-                Slot--;      // Decrement Slot only if it's greater than 0
+            if (Slot > 0) {
+                Slot--;
                 leftDetected = true;
                 rightDetected = true;
                 Serial.println("Passenger detected by sensor 2");
-                triggerBuzzer(); // Trigger buzzer when passenger is detected
+                triggerBuzzer();
+                if (Slot == 0) {
+                    // Update database and send LoRa message when Slot becomes 0
+                    updateDatabase(DEVICE_1_ADDRESS, String(bearing));
+                    sendLoRaMessage(DEVICE_2_ADDRESS, "DATA_FROM_DEVICE_1: Slot=0");
+                    Serial.println("Slot is now 0");
+                }
             } else {
+                Slot = 0;
+                leftDetected = true;
+                rightDetected = true;
                 Serial.println("Cannot decrement Slot, it's already 0");
             }
         }
@@ -151,7 +219,6 @@ void loop() {
     }
 
     // Send data over LoRa only when Slot has been updated
-    unsigned long currentMillis = millis();
     if (currentMillis - previousMillis >= interval && (Slot > 0)) {
         previousMillis = currentMillis;
         // Update the database with Slot and bearing
@@ -160,6 +227,11 @@ void loop() {
         sendLoRaMessage(DEVICE_2_ADDRESS, "DATA_FROM_DEVICE_1: Slot=" + String(Slot));
         Serial.print("Sending data: Slot = ");
         Serial.println(Slot);
+    }
+
+    // Ensure HTTP request is sent when Slot is 0
+    if (Slot == 0) {
+        updateDatabase(DEVICE_1_ADDRESS, String(bearing));
     }
 }
 
@@ -192,9 +264,14 @@ int getDistance(int trigPin, int echoPin) {
 }
 
 void updateDatabase(int id, const String& value) {
-    if (WiFi.status() == WL_CONNECTED) { // Check if WiFi is connected
-        const char* serverUrl = "http://192.168.43.100/jeepfinder/location"; // Your server URL
-        String postData = "ID=" + String(id) + "&message=" + String(Slot) + "&lat=" + String(gps.location.lat(), 6) + "&lon=" + String(gps.location.lng(), 6) + "&rotation=" + String(bearing);
+    if (WiFi.status() == WL_CONNECTED) {
+        const char* serverUrl = "http://192.168.1.5/jeepfinder/location";
+        int currentSlot = (Slot > 0) ? Slot : 0;
+        String postData = "ID=" + String(id) + 
+                         "&message=" + String(currentSlot) + 
+                         "&lat=" + String(gps.location.lat(), 6) + 
+                         "&lon=" + String(gps.location.lng(), 6) + 
+                         "&rotation=" + String(lastValidBearing);
         if (gps.speed.isValid()) {
             postData += "&speed=" + String(gps.speed.kmph());
         }
