@@ -10,6 +10,7 @@ $emailExists = false;
 $insertSuccess = false;
 
 if(isset($_POST['submit'])) {
+    $status = 'offline';
     $fname = $_POST['fname'];
     $mname = $_POST['mname'];
     $lname = $_POST['lname'];
@@ -24,7 +25,7 @@ if(isset($_POST['submit'])) {
     if ($result->num_rows > 0) {
         $emailExists = true;
     } else {
-        $sql = "INSERT INTO `user`(`fname`,`mname`,`lname`, `email`, `user`, `password`, `account`) VALUES ('$fname','$mname','$lname','$email','$user','$hashedPassword','$account')";
+        $sql = "INSERT INTO `user`(`fname`,`mname`,`lname`, `email`, `user`, `password`, `account`, `status`) VALUES ('$fname', '$mname', '$lname', '$email', '$user', '$hashedPassword', '$account', '$status')";
         if ($conn->query($sql) === TRUE) {
             $insertSuccess = true;
         } else {

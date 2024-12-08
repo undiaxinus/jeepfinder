@@ -8,6 +8,7 @@
     <th>Action</th>
 </tr>
 <?php
+    $ids = $_GET['id'] ?? null;
     include "../connection/conn.php";
     date_default_timezone_set('Asia/Manila');
     $date = date('Y-m-d h:i A');
@@ -29,10 +30,10 @@
             echo "
              <td>
                     <div class='action-buttons'>
-                        <a href='edit_jeepney.php?id={$row['id']}' class='btn-icon edit' title='Edit'>
+                        <a href='edit.php?ids={$row['id']}}&id={$ids}' class='btn-icon edit' title='Edit'>
                             <i class='bx bxs-edit'></i>
                         </a>
-                        <a href='delete_jeepney.php?id={$row['id']}' class='btn-icon delete' title='Delete'>
+                        <a href='delete_user.php?ids={$row['id']}}&id={$ids}' class='btn-icon delete' title='Delete'>
                             <i class='bx bxs-trash'></i>
                         </a>
                     </div>

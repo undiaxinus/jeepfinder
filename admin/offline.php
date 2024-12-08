@@ -251,11 +251,16 @@
                 bottom: 60px;
                 right: 0;
                 list-style: none;
-                background: white;
+                background: rgba(255, 255, 255, 0.05);
                 border-radius: 12px;
                 padding: 8px 0;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
                 min-width: 150px;
+                color: #fff;
+                border-radius: 20px;
+                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+                backdrop-filter: blur(4px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
             }
 
             .addemergency ul li {
@@ -264,7 +269,7 @@
             }
 
             .addemergency ul li a {
-                color: #333 !important;
+                color: #fff !important;
                 text-decoration: none;
                 display: block;
                 font-size: 14px;
@@ -598,8 +603,14 @@
             }
 
             .addemergency li a:hover {
-                background: #f5f5f5;
-                border-radius: 8px;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 8px
+                color: #000;
+                border-radius: 20px;
+                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+                backdrop-filter: blur(4px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+
             }
 
             /* Status styling */

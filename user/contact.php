@@ -557,6 +557,14 @@
         width: 3px;
       }
     }
+    .ellipsis {
+  display: inline-block;
+  max-width: 7ch; /* Limits to 7 characters (ch unit is based on the width of the character '0') */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 
     /* Additional adjustments for very small screens */
     @media only screen and (max-width: 480px) {
@@ -578,31 +586,43 @@
         <div class="chat">
           <div class="card mb-sm-3 mb-md-0 contacts_card">
             <div class="card-body contacts_body">
-              <ul class="contacts">
-                <?php foreach ($contact as $c): ?>
-                  <li class="contact-item" 
-                    data-id="<?php echo $c['id']; ?>" 
-                    data-fullname="<?php echo htmlspecialchars($c['fname'] . ' ' . $c['mname'] . ' ' . $c['lname']); ?>" 
-                    data-username="<?php echo htmlspecialchars($c['user']); ?>" 
-                    data-status="<?php echo htmlspecialchars($c['status']); ?>">
-                    <div class="d-flex bd-highlight">
-                      <div class="img_cont">
-                        <img src="../img/sbmo.png" class="rounded-circle user_img">
-                        <?php
-                          if($c['status'] == "online"){
-                            echo '<span class="online_icon"><b>'.getUnreadMessageCount($c['user']).'</b></span>';
-                          }else{
-                            echo '<span class="online_icons"><b>'.getUnreadMessageCount($c['user']).'</b></span>';
-                          }
-                        ?>
-                      </div>
-                      <div class="user_info">
-                        <span><?php echo htmlspecialchars($c['fname']); ?></span>
-                      </div>
-                    </div>
-                  </li>
-                <?php endforeach; ?>
-              </ul>
+            <ul class="contacts">
+    <?php foreach ($contact as $c): ?>
+        <?php
+            // Listahan ng mga random na larawan
+            $images = [
+                "../img/c_avatar/avatar1.gif",
+                "../img/c_avatar/avatar2.gif",
+                "../img/c_avatar/avatar3.gif"
+            ];
+            // Random na pumili ng larawan mula sa listahan
+            $randomImage = $images[array_rand($images)];
+        ?>
+        <li class="contact-item" 
+            data-id="<?php echo $c['id']; ?>" 
+            data-fullname="<?php echo htmlspecialchars($c['fname'] . ' ' . $c['mname'] . ' ' . $c['lname']); ?>" 
+            data-username="<?php echo htmlspecialchars($c['user']); ?>" 
+            data-status="<?php echo htmlspecialchars($c['status']); ?>">
+            <div class="d-flex bd-highlight">
+                <div class="img_cont">
+                    <img id="randomImage" src="<?php echo $randomImage; ?>" class="rounded-circle user_img">
+                    <?php
+                        if ($c['status'] == "online") {
+                            echo '<span class="online_icon"></span>';
+                        } else {
+                            echo '<span class="online_icons"></span>';
+                        }
+                    ?>
+                </div>
+                <div class="user_info">
+                <span class="ellipsis"><?php echo htmlspecialchars($c['fname'] . ' ' . $c['lname']); ?></span>
+
+                </div>
+            </div>
+        </li>
+    <?php endforeach; ?>
+</ul>
+
             </div>
             
           </div>
@@ -621,6 +641,7 @@
                   <span id="receiver-name">Customer Service</span>
                 </div>
               </div> -->
+              <h5 class="card-title" style="color: white;" id="receiver-name">Costumer Service</h5>
             </div>
             <div class="card-body msg_card_body"></div>
             <form method="post" action="">

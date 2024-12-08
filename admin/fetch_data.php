@@ -1,59 +1,74 @@
-<tr>
-    
-</tr>
+
 <?php
-    include "../connection/conn.php";
-    date_default_timezone_set('Asia/Manila');
-    $date = date('Y-m-d h:i A');
+$ids = $_GET['id'] ?? null;
+include "../connection/conn.php";
+date_default_timezone_set('Asia/Manila');
+$date = date('Y-m-d h:i A');
 
-    $sql = "SELECT * FROM `locate`";
-    $result = $conn->query($sql);
+$sql = "SELECT * FROM `locate`";
+$result = $conn->query($sql);
 
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            // Calculate time difference
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        // Initialize variables for status
+        $statusClass = "not-activated";
+        $statusText = "Device not activated";
+
+        if (!empty($row['resdate'])) {
+            // Calculate time difference only if `resdate` is not empty
             $currentTime = new DateTime();
             $responseTime = new DateTime($row['resdate']);
             $diffInMinutes = $currentTime->diff($responseTime)->i;
-            
-            echo "<tr>
-                <td class='driver-info'>
-                    <div class='info-row'>Driver's name: {$row['drivername']}</div>
-                    <div class='info-row'>Address: {$row['address']}</div>
-                    <div class='info-row'>Company: {$row['company_name']}</div>
-                    <div class='info-row'>Phone: {$row['cnumber']}</div>
-                    <div class='info-row'>Plate: {$row['platenumber']}</div>
-                    <div class='info-row'>Route: {$row['route']}</div>
-                </td>
-                <td class='jeepney-info'>
-                    <div class='info-row'>Passengers: {$row['passenger']}</div>
-                    <div class='info-row'>Location: {$row['latitude']},{$row['longitude']}</div>
-                    <div class='info-row'>Response: {$row['resdate']}</div>
-                    <div class='info-row'>Current: {$date}</div>
-                </td>
-                <td class='status-cell'>
-                    <span class='status " . ($diffInMinutes > 5 ? 'connection-lost' : 'active') . "'>
-                        " . ($diffInMinutes > 5 ? 'Connection lost' : 'Active') . "
-                    </span>
-                </td>
-                <td>
-                    <div class='action-buttons'>
-                        <a href='edit_jeepney.php?id={$row['ID']}' class='btn-icon edit' title='Edit'>
-                            <i class='bx bxs-edit'></i>
-                        </a>
-                        <a href='delete_jeepney.php?id={$row['ID']}' class='btn-icon delete' title='Delete'>
-                            <i class='bx bxs-trash'></i>
-                        </a>
-                    </div>
-                </td>
-            </tr>";
-        }
-    } else {
-        echo "<tr><td colspan='4'>No data found</td></tr>";
-    }
 
-    $conn->close();
+            // Determine status based on time difference
+            if ($diffInMinutes > 5) {
+                $statusClass = "connection-lost";
+                $statusText = "Connection lost";
+            } else {
+                $statusClass = "active";
+                $statusText = "Active";
+            }
+        }
+
+        echo "<tr>
+            <td class='driver-info'>
+                <div class='info-row'>Driver's name: {$row['drivername']}</div>
+                <div class='info-row'>Address: {$row['address']}</div>
+                <div class='info-row'>Company: {$row['company_name']}</div>
+                <div class='info-row'>Phone: {$row['cnumber']}</div>
+                <div class='info-row'>Plate: {$row['platenumber']}</div>
+                <div class='info-row'>Route: {$row['route']}</div>
+            </td>
+            <td class='jeepney-info'>
+                <div class='info-row'>Passengers: {$row['passenger']}</div>
+                <div class='info-row'>Location: {$row['latitude']},{$row['longitude']}</div>
+                <div class='info-row'>Response: {$row['resdate']}</div>
+                <div class='info-row'>Current: {$date}</div>
+            </td>
+            <td class='status-cell'>
+                <span class='status {$statusClass}'>
+                    {$statusText}
+                </span>
+            </td>
+            <td>
+                <div class='action-buttons'>
+                    <a href='edit_jeepney.php?ids={$row['ID']}&id={$ids}' class='btn-icon edit' title='Edit'>
+                        <i class='bx bxs-edit'></i>
+                    </a>
+                    <a href='delete_jeepney.php?ids={$row['ID']}&id={$ids}' class='btn-icon delete' title='Delete'>
+                        <i class='bx bxs-trash'></i>
+                    </a>
+                </div>
+            </td>
+        </tr>";
+    }
+} else {
+    echo "<tr><td colspan='4'>No data found</td></tr>";
+}
+
+$conn->close();
 ?>
+
 
 <style>
 .info-row {
@@ -81,6 +96,10 @@
 .status.connection-lost {
     background: rgba(244, 67, 54, 0.2);
     color: #f44336;
+}
+.status.not-activated {
+    background: rgba(245, 167, 66, 0.2);
+    color: #f5a742;
 }
 
 .action-buttons {
