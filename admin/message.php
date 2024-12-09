@@ -19,7 +19,7 @@
       $insertSuccess = true;
       
       // Update unread messages to read for the sender
-      $updateSql = "UPDATE message SET message_status = 'read' WHERE receiver_name = '$sender_id' AND message_status = 'unread'";
+      $updateSql = "UPDATE message SET message_status = 'read' WHERE receiver_name = '$sender_id' AND sender_name = '$receiver_name' AND message_status = 'unread'";
       $conn->query($updateSql);
       
     } else {

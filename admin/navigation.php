@@ -407,7 +407,10 @@
     i{
       padding-top: 5px;
     }
+    
   }
+  
+
   .sidebar, .sidebar li a, .sidebar i, .links_name {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
@@ -425,6 +428,23 @@
   /* Smooth transitions */
   .sidebar li a, .sidebar li i, .sidebar li .links_name {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .mail-badge{
+    display: none; 
+    background-color: red; 
+    color: white; 
+    border-radius: 50%;
+    width: 20px; 
+    height: 20px; 
+    margin-top: 5px; 
+    margin-right: 1px; 
+    padding-left: 8px; 
+    justify-content: center; 
+    align-items: center; 
+    font-size: 12px; 
+    position: absolute; 
+    top: 0; 
+    right: 0;
   }
   </style>
   <body>
@@ -446,7 +466,7 @@
           <a href="message.php?id=<?php echo $id ?>">
             <i class='bx bx-envelope'></i>
             <span class="links_name">Mail</span>
-            <span class="mail-badge" style="display: none; background-color: red; color: white; border-radius: 50%;width: 20px; height: 20px; margin-top: 5px; margin-right: 1px; padding-left: 8px; justify-content: center; align-items: center; font-size: 12px; position: absolute; top: 0; right: 0;">0</span>
+            <span class="mail-badge">0</span>
             </a>
           <span class="tooltip">Mail</span>
         </li>

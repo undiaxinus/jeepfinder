@@ -297,7 +297,16 @@ if (isset($_POST['submit'])) {
             width: 280px;
             padding: 30px;
         }
-
+        .form-group{
+            width: 90%;
+        }
+        .btn{
+            width: 90%;
+        }
+        .signup-link{
+            margin-left: -2px;
+        }
+        
         .jeep {
             width: 250px;
         }

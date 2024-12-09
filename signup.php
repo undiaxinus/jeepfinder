@@ -2,7 +2,8 @@
 //signup.php function
 include_once("connection/connect.php");
 $conn = connection();
-
+$rand = uniqid('user_', true);
+$hashedRand = hash('sha256', $rand);
 $emailExists = false; // Flag to check if email already exists
 $insertSuccess = false; // Flag to check if insertion was successful
 
@@ -268,6 +269,15 @@ if(isset($_POST['submit'])) {
         .jeep {
             width: 250px;
         }
+        .form-group{
+            width: 90%;
+        }
+        .btn{
+            width: 90%;
+        }
+        .login-link{
+            margin-left: -2px;
+        }
     }
 
     /* Add these styles */
@@ -399,7 +409,7 @@ if(isset($_POST['submit'])) {
         <div class="form-message"></div>
     </div>
     <div class="form-group">
-        <input type="hidden" name="user" value="<?php echo $rand;?>"/>
+        <input type="hidden" name="user" value="<?php echo $hashedRand; ?>"/>
     </div>
     <div class="form-group">
         <input id="password" type="password" name="password" required="required" class="form-control" placeholder="Enter your password"/>
