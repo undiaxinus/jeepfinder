@@ -319,23 +319,50 @@ function updateRealTimeData() {
                 }
             });
 
-            // Attempt to retrieve the last known location from local storage
-            const cachedLocation = JSON.parse(localStorage.getItem('lastLocation'));
-            if (cachedLocation) {
-                userMarker = L.marker(cachedLocation, {
-                    icon: L.divIcon({
-                        className: 'user-marker',
-                        html: `
-                            <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="20" cy="20" r="18" fill="rgba(0, 0, 255, 0.3)" />
-                        <circle cx="20" cy="20" r="5" fill="blue" /> <!-- Solid dot in the center -->
-                    </svg>
-                        `,
-                        iconSize: [40, 40],
-                        iconAnchor: [20, 40]
-                    })
-                }).addTo(map);
-            }
+           // Attempt to retrieve the last known location from local storage
+const cachedLocation = JSON.parse(localStorage.getItem('lastLocation'));
+if (cachedLocation) {
+    userMarker = L.marker(cachedLocation, {
+        icon: L.divIcon({
+            className: 'user-marker',
+            html: `
+                <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="20" cy="20" r="5" fill="rgba(255, 0, 0, 0.3)" class="ping-circle" /> <!-- Red ping circle -->
+                    <circle cx="20" cy="20" r="5" fill="red" /> <!-- Solid red dot in the center -->
+                </svg>
+            `,
+            iconSize: [40, 40],
+            iconAnchor: [20, 40]
+        })
+    }).addTo(map);
+
+    // Add animation to the ping circle
+    const pingCircle = document.querySelector('.ping-circle');
+    if (pingCircle) {
+        pingCircle.style.animation = 'ping-animation 1.5s infinite';
+    }
+}
+
+// CSS for the ping animation
+const style = document.createElement('style');
+style.innerHTML = `
+    @keyframes ping-animation {
+        0% {
+            r: 5;   /* Start from the size of the solid red dot */
+            opacity: 1;
+        }
+        50% {
+            r: 18;  /* Grow to the outer circle size */
+            opacity: 0.5;
+        }
+        100% {
+            r: 5;   /* Return to the size of the solid red dot */
+            opacity: 1;
+        }
+    }
+`;
+document.head.appendChild(style);
+
 
             for (var i = 0; i < data.length; i++) {
                 var id = data[i].id;
@@ -354,7 +381,17 @@ function updateRealTimeData() {
                 // Original SVG marker for real-time data
                 var markerIcon = L.divIcon({
                     className: 'custom-icon',
-                    html: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><image href="../img/${jeep}" width="32" height="32" transform="rotate(${rotate} 16 16)"/></svg>`,
+                    html: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                            <!-- Apply a drop shadow filter -->
+                            <defs>
+                                <filter id="drop-shadow">
+                                    <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="red"/>
+                                </filter>
+                            </defs>
+                            <!-- The image with a drop shadow border effect -->
+                            <image href="../img/${jeep}" width="32" height="32" transform="rotate(${rotate} 16 16)" filter="url(#drop-shadow)"/>
+                        </svg>
+                        `,
                     iconAnchor: [16, 32],
                     popupAnchor: [0, -32]
                 });
@@ -378,7 +415,6 @@ function updateRealTimeData() {
                     // Skip calculations if no user location is available
                     continue;
                 }
-
                 
                 var distanceToUser = calculateDistance(latitude, longitude, userLat, userLng);
                 var { hours, minutes } = calculateETAWithSpeed(distanceToUser, speed);
