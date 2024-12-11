@@ -34,14 +34,12 @@
       $contact[] = $row;
     }
   }
-  $user = $row['user'];
-
   
-  function getUnreadMessageCount($username) {
+  function getUnreadMessageCount($username, $receiver) {
     global $conn;
-    $sql = "SELECT COUNT(*) as unread_count FROM message WHERE sender_name = ? AND message_status = 'unread'";
+    $sql = "SELECT COUNT(*) as unread_count FROM message WHERE sender_name = ? AND receiver_name = ? AND message_status = 'unread'";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $username);
+    $stmt->bind_param("ss", $username, $receiver);
     $stmt->execute();
     $result = $stmt->get_result();
     $data = $result->fetch_assoc();
@@ -610,7 +608,7 @@
                 <div class="img_cont">
                     <img id="randomImage" src="<?php echo $randomImage; ?>" class="rounded-circle user_img">
                     <?php
-                $unreadCount = getUnreadMessageCount($c['user'], $conn);
+                $unreadCount = getUnreadMessageCount($c['user'], $sender_id, $conn);
                 if ($c['status'] == "online") {
                     echo '<span class="online_icon">' . $unreadCount . '</span>';
                 } else {
