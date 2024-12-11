@@ -265,7 +265,7 @@ int getDistance(int trigPin, int echoPin) {
 
 void updateDatabase(int id, const String& value) {
     if (WiFi.status() == WL_CONNECTED) {
-        const char* serverUrl = "http://192.168.1.5/jeepfinder/location";
+        const char* serverUrl = "https://peachpuff-donkey-807602.hostingersite.com/location";
         int currentSlot = (Slot > 0) ? Slot : 0;
         String postData = "ID=" + String(id) + 
                          "&message=" + String(currentSlot) + 

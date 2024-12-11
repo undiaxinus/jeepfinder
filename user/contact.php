@@ -34,14 +34,8 @@
         $contact[] = $row;
     }
   }
-  $messages = [];
-  $messageSql = "SELECT * FROM message WHERE sender_name = '$sender_id' OR receiver_name = '$sender_id' ORDER BY timestamp";
-  $messageResult = $conn->query($messageSql);
-  if ($messageResult->num_rows > 0) {
-    while ($msgRow = $messageResult->fetch_assoc()) {
-      $messages[] = $msgRow;
-    }
-  }
+  $user = $row['user'];
+  
   function getUnreadMessageCount($username) {
     global $conn;
     $sql = "SELECT COUNT(*) as unread_count FROM message WHERE sender_name = ? AND message_status = 'unread'";
@@ -52,6 +46,15 @@
     $data = $result->fetch_assoc();
     return $data['unread_count'];
   }
+  $messages = [];
+  $messageSql = "SELECT * FROM message WHERE sender_name = '$sender_id' OR receiver_name = '$sender_id' ORDER BY timestamp";
+  $messageResult = $conn->query($messageSql);
+  if ($messageResult->num_rows > 0) {
+    while ($msgRow = $messageResult->fetch_assoc()) {
+      $messages[] = $msgRow;
+    }
+  }
+  
 ?>
 <!DOCTYPE html>
 <html>
@@ -607,12 +610,13 @@
                 <div class="img_cont">
                     <img id="randomImage" src="<?php echo $randomImage; ?>" class="rounded-circle user_img">
                     <?php
-                        if ($c['status'] == "online") {
-                            echo '<span class="online_icon"></span>';
-                        } else {
-                            echo '<span class="online_icons"></span>';
-                        }
-                    ?>
+                $unreadCount = getUnreadMessageCount($c['user'], $conn);
+                if ($c['status'] == "online") {
+                    echo '<span class="online_icon">' . $unreadCount . '</span>';
+                } else {
+                    echo '<span class="online_icons">' . $unreadCount . '</span>';
+                }
+                ?>
                 </div>
                 <div class="user_info">
                 <span class="ellipsis"><?php echo htmlspecialchars($c['fname'] . ' ' . $c['lname']); ?></span>
