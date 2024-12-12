@@ -1,10 +1,57 @@
 <?php
 session_start();
-if($_SESSION['Role'] != 'user'){
+if ($_SESSION['Role'] !== 'user') {
     header('Location: ../index.html?error=Access denied');
     exit;
 }
+
+$user_id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_STRING);
+include '../connection/conn.php';
+$alert_message = '';
+$average_rating = 0; // Variable to store the average rating
+
+// Handle form submission
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $rate = filter_input(INPUT_POST, 'rating', FILTER_VALIDATE_INT);
+    $comment = filter_input(INPUT_POST, 'comment', FILTER_SANITIZE_STRING);
+
+    if ($rate !== false && $rate >= 1 && $rate <= 5 && $comment !== false) {
+        $stmt = $conn->prepare("INSERT INTO ratings (user_id, rate, comment) VALUES (?, ?, ?)");
+        $stmt->bind_param("sis", $user_id, $rate, $comment);
+
+        if ($stmt->execute()) {
+            $alert_message = "Thank you for your feedback!";
+        } else {
+            $alert_message = "Error: " . $stmt->error;
+        }
+
+        $stmt->close();
+    } else {
+        $alert_message = "Invalid input. Please try again.";
+    }
+}
+
+// Fetch all ratings for the product and calculate the average rating
+$stmt = $conn->prepare("SELECT rate FROM ratings WHERE user_id = ?");
+$stmt->bind_param("s", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$total_ratings = 0;
+$rating_count = 0;
+
+while ($row = $result->fetch_assoc()) {
+    $total_ratings += $row['rate'];
+    $rating_count++;
+}
+
+// Calculate the average rating if there are any ratings
+if ($rating_count > 0) {
+    $average_rating = round($total_ratings / $rating_count, 1); // Round to one decimal place
+}
+
+$stmt->close();
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,6 +59,7 @@ if($_SESSION['Role'] != 'user'){
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>SABAT MO</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style type="text/css">
         .home-section {
             display: flex;
@@ -149,6 +197,63 @@ if($_SESSION['Role'] != 'user'){
             font-size: 16px;
             color: #fff;
         }
+        .rating-stars {
+    display: flex;
+    gap: 5px;
+}
+
+.feedback-section {
+    margin-top: 20px;
+    display: none;
+}
+
+.feedback-section textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+.feedback-section button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.feedback-section button:hover {
+    background-color: #45a049;
+}
+
+
+.rating-stars input {
+    display: none; /* Hide the radio buttons */
+}
+
+.rating-stars label {
+    font-size: 2rem;
+    color: gray;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.rating-stars input:checked ~ label {
+    color: gray; /* Reset color after selection */
+}
+
+.rating-stars input:checked + label,
+.rating-stars input:checked ~ label:hover {
+    color: gold; /* Highlight selected star and those before it */
+}
+.rating-stars:hover .Star-1.Checked {Background Blue}
+.transition.animation**Hope your implementation works
+
         @media (max-width: 768px) {
             .container {
                 padding: 20px;
@@ -206,15 +311,64 @@ if($_SESSION['Role'] != 'user'){
                 <div class="subtitle">"STAY ON TRACK IN LEGAZPI: REAL-TIME MONITORING FOR SMOOTHER RIDES."</div>
                 Implementing a Real-Time Location and Passenger Monitoring System for Legazpi’s Jeepneys, this mobile application enhances passengers' overall experience in Jeepneys by providing them with real-time information and features that contribute to a more informed, efficient, and comfortable journey. Powered by GPS technology and onboard sensors for passenger counting, this mobile application provides passengers with instant updates on jeepney location and available seating capacity, ensuring an excellent and informed travel experience. By using these technologies, both passengers and operators can optimize their journey planning, leading to improved efficiency, reduced wait times, and enhanced satisfaction for all users in Legazpi's transportation network.
             </div>
+            
             <div class="rating">
                 <p>HOW IS YOUR EXPERIENCE?</p>
                 <p>Please rate us</p>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star" style="color: gray;"></i>
-            </div>
+                <form action="" method="POST">
+                    <!-- Radio buttons for star rating -->
+                    <div class="rating-stars">
+                        <input type="radio" id="star1" name="rating" value="1">
+                        <label for="star1" class="fas fa-star"></label>
+
+                        <input type="radio" id="star2" name="rating" value="2">
+                        <label for="star2" class="fas fa-star"></label>
+
+                        <input type="radio" id="star3" name="rating" value="3">
+                        <label for="star3" class="fas fa-star"></label>
+
+                        <input type="radio" id="star4" name="rating" value="4">
+                        <label for="star4" class="fas fa-star"></label>
+
+                        <input type="radio" id="star5" name="rating" value="5">
+                        <label for="star5" class="fas fa-star"></label>
+                    </div>
+
+                    <div id="feedback-section" class="feedback-section">
+                    <textarea id="comment" name="comment" placeholder="Your comment here..." rows="4"></textarea>
+                    <button id="submit-button" type="submit">Submit</button>
+                </div>
+                </form>
+                    <div class="average-rating">
+                        <p>Average Rating: 
+                            <?php echo $average_rating ? $average_rating : 'No ratings yet'; ?> / 5
+                        </p>
+                        <div class="stars" style="pointer-events: none;">
+                            <?php
+                                $total_stars = 5;
+                                $full_stars = floor($average_rating); // Whole stars
+                                $half_star = ($average_rating - $full_stars) >= 0.5 ? 1 : 0; // Half star
+                                $empty_stars = $total_stars - $full_stars - $half_star;
+
+                                // Display full stars
+                                for ($i = 0; $i < $full_stars; $i++) {
+                                    echo '<i class="fas fa-star"></i>';
+                                }
+
+                                // Display half star
+                                if ($half_star) {
+                                    echo '<i class="fas fa-star-half-alt"></i>';
+                                }
+
+                                // Display empty stars
+                                for ($i = 0; $i < $empty_stars; $i++) {
+                                    echo '<i class="far fa-star"></i>';
+                                }
+                            ?>
+                        </div>
+                    </div>
+                </div>
+
             <div class="footer">
                 <div class="social">
                     <p>FOR MORE INFO<br>VISIT US ON:</p>
@@ -229,5 +383,35 @@ if($_SESSION['Role'] != 'user'){
             </div>
         </div>
     </section>
+    <?php if ($alert_message): ?>
+                    <script>
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Feedback',
+                            text: "<?= $alert_message; ?>",
+                        });
+                    </script>
+                <?php endif; ?>
 </body>
+<script>
+  const stars = document.querySelectorAll('.rating .fa-star');
+  const feedbackSection = document.getElementById('feedback-section');
+
+  stars.forEach((star, index) => {
+      star.addEventListener('click', () => {
+          // Set all stars to gray initially
+          stars.forEach(s => s.style.color = 'gray');
+
+          // Set the selected stars to gold
+          stars.forEach((s, i) => {
+              if (i <= index) {
+                  s.style.color = 'gold';
+              }
+          });
+
+          // Show the feedback section
+          feedbackSection.style.display = 'block';
+      });
+  });
+</script>
 </html>
