@@ -29,10 +29,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $alert_message = "Invalid input. Please try again.";
     }
 }
-
 // Fetch all ratings for the product and calculate the average rating
-$stmt = $conn->prepare("SELECT rate FROM ratings WHERE user_id = ?");
-$stmt->bind_param("s", $user_id);
+$stmt = $conn->prepare("SELECT rate FROM ratings");
 $stmt->execute();
 $result = $stmt->get_result();
 $total_ratings = 0;
@@ -46,9 +44,12 @@ while ($row = $result->fetch_assoc()) {
 // Calculate the average rating if there are any ratings
 if ($rating_count > 0) {
     $average_rating = round($total_ratings / $rating_count, 1); // Round to one decimal place
+} else {
+    $average_rating = 0; // Set to 0 or some default value when there are no ratings
 }
 
 $stmt->close();
+
 ?>
 <!DOCTYPE html>
 <html>

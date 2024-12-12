@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 
 // Fetch all ratings for the product and calculate the average rating
-$stmt = $conn->prepare("SELECT rate FROM ratings WHERE user_id = ?");
+$stmt = $conn->prepare("SELECT rate FROM ratings");
 $stmt->bind_param("s", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
