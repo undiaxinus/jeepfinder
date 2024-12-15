@@ -76,7 +76,7 @@ $stmt->close();
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
             backdrop-filter: blur(4px);
             border: 1px solid rgba(255, 255, 255, 0.18);
-            width: 90%;
+            width: 100%;
             margin-bottom: 30px;
         }
         .title {
@@ -375,10 +375,12 @@ $stmt->close();
                     <i class="fab fa-instagram"></i>
                     <i class="fab fa-youtube"></i>
                 </div>
+                <a href="https://drive.google.com/file/d/1wF4JHSBW90USiJ8dfqEZHVLMVXllZaTg/view?usp=sharing" style="text-decoration: none;">
                 <div class="qr">
                     <p>DOWNLOAD APP NOW</p>
-                    <img src="../img/QR.png" alt="QR Code">
+                    <img src="../img/jeepfinderqr.png" alt="JeepFinder QR Code">
                 </div>
+                </a>
             </div>
         </div>
     </section>

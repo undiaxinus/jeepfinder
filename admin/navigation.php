@@ -477,6 +477,7 @@
           </a>
           <span class="tooltip">About</span>
         </li>
+
         <li>
           <a href="logout.php?id=<?php echo $id ?>">
             <i class='bx bx-log-out' ></i>

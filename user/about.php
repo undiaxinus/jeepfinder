@@ -30,10 +30,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $alert_message = "Invalid input. Please try again.";
     }
 }
-
 // Fetch all ratings for the product and calculate the average rating
 $stmt = $conn->prepare("SELECT rate FROM ratings");
-$stmt->bind_param("s", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 $total_ratings = 0;
@@ -47,9 +45,12 @@ while ($row = $result->fetch_assoc()) {
 // Calculate the average rating if there are any ratings
 if ($rating_count > 0) {
     $average_rating = round($total_ratings / $rating_count, 1); // Round to one decimal place
+} else {
+    $average_rating = 0; // Set to 0 or some default value when there are no ratings
 }
 
 $stmt->close();
+
 ?>
 
 <!DOCTYPE html>
@@ -77,7 +78,7 @@ $stmt->close();
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
             backdrop-filter: blur(4px);
             border: 1px solid rgba(255, 255, 255, 0.18);
-            width: 90%;
+            width: 100%;
             margin-bottom: 30px;
         }
         .title {
@@ -376,10 +377,12 @@ $stmt->close();
                     <i class="fab fa-instagram"></i>
                     <i class="fab fa-youtube"></i>
                 </div>
+                <a href="https://drive.google.com/file/d/1wF4JHSBW90USiJ8dfqEZHVLMVXllZaTg/view?usp=sharing" style="text-decoration: none;">
                 <div class="qr">
                     <p>DOWNLOAD APP NOW</p>
-                    <img src="../img/QR.png" alt="QR Code">
+                    <img src="../img/jeepfinderqr.png" alt="JeepFinder QR Code">
                 </div>
+                </a>
             </div>
         </div>
     </section>

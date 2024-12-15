@@ -478,6 +478,12 @@ if (!$row) {
        </a>
        <span class="tooltip">About</span>
      </li>
+     <li>
+        <a href="settings.php?id=<?php echo $id ?>">
+          <i class="bx bx-cog"></i>
+          <span class="links_name">User Settings</span>
+        </a>
+      </li>
     
      <li>
        <a href="logout.php?id=<?php echo $id ?>">
