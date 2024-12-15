@@ -480,8 +480,8 @@ if (!$row) {
      </li>
      <li>
         <a href="settings.php?id=<?php echo $id ?>">
-          <i class="bx bx-cog"></i>
-          <span class="links_name">User Settings</span>
+          <i class="bx bx-user"></i>
+          <span class="links_name">Profile</span>
         </a>
       </li>
     

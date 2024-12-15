@@ -1,6 +1,6 @@
 <?php 
 session_start();
-if ($_SESSION['Role'] != 'user') {
+if ($_SESSION['Role'] != 'admin') {
     header('Location: ../index.html?error=Access denied'); 
     exit();
 }
@@ -26,7 +26,7 @@ $updateSuccess = false;
 
 // File handling for profile picture
 if(isset($_FILES['profile_picture']) && $_FILES['profile_picture']['name'] != '') {
-    $target_dir = "../img/avatar/";
+    $target_dir = "../img/c_avatar/";
     $file_extension = strtolower(pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION));
     $new_filename = uniqid() . '.' . $file_extension; // Generate unique filename
     $target_file = $target_dir . $new_filename;
@@ -303,7 +303,7 @@ if (isset($_POST['submit'])) {
                 <h1>Profile Settings</h1>
                 <form action="" method="post" enctype="multipart/form-data">
                     <div class="profile-picture-container">
-                        <img src="../img/avatar/<?php echo htmlspecialchars($profilePic); ?>" alt="Profile Picture" id="profilePreview">
+                        <img src="../img/c_avatar/<?php echo htmlspecialchars($profilePic); ?>" alt="Profile Picture" id="profilePreview">
                         <div class="file-input-wrapper">
                             <input type="file" name="profile_picture" accept="image/*" onchange="previewImage(this);" class="form-control">
                         </div>

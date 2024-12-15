@@ -477,7 +477,12 @@
           </a>
           <span class="tooltip">About</span>
         </li>
-
+        <li>
+          <a href="settings.php?id=<?php echo $id ?>">
+            <i class="bx bx-user"></i>
+            <span class="links_name">Profile</span>
+          </a>
+        </li>
         <li>
           <a href="logout.php?id=<?php echo $id ?>">
             <i class='bx bx-log-out' ></i>
