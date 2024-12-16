@@ -375,7 +375,7 @@ $stmt->close();
                     <i class="fab fa-instagram"></i>
                     <i class="fab fa-youtube"></i>
                 </div>
-                <a href="https://drive.google.com/file/d/1wF4JHSBW90USiJ8dfqEZHVLMVXllZaTg/view?usp=sharing" style="text-decoration: none;">
+                <a href="download.php" style="text-decoration: none;">
                 <div class="qr">
                     <p>DOWNLOAD APP NOW</p>
                     <img src="../img/jeepfinderqr.png" alt="JeepFinder QR Code">
