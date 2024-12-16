@@ -488,6 +488,9 @@
                     padding: 4px 8px;
                     font-size: 11px;
                 }
+                .table-container {
+                    width:340px;
+                }
             }
 
             /* Custom scrollbar for the table container */

@@ -419,6 +419,7 @@ $conn->close();
                 border-radius: 0 0 15px 15px;
                 overflow: hidden;
                 border-top: 1px solid rgba(255, 255, 255, 0.1);
+                width:1250px;
             }
 
             .table-container {
@@ -591,6 +592,12 @@ $conn->close();
                 
                 .info-row strong {
                     font-size: 12px;
+                }
+                .table-container {
+                    width:340px;
+                }
+                #map {
+                    width:340px;
                 }
             }
 
