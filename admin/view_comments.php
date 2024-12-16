@@ -19,33 +19,36 @@ include '../connection/conn.php';
         body {
             background: rgba(0, 0, 0, 0.1);
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             font-family: Arial, sans-serif;
         }
 
         .container {
             max-width: 1000px;
-            margin: 20px auto;
+            margin: 10px auto;
             background: rgba(17, 16, 29, 0.95);
-            padding: 30px;
-            border-radius: 20px;
+            padding: 15px;
+            border-radius: 15px;
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            width: 90%;
         }
 
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
 
         .back-btn {
-            padding: 10px 20px;
+            padding: 8px 15px;
             background: linear-gradient(45deg, #ff3366, #ff0000);
             color: white;
             text-decoration: none;
             border-radius: 5px;
             transition: transform 0.3s ease;
+            font-size: 14px;
         }
 
         .back-btn:hover {
@@ -55,24 +58,26 @@ include '../connection/conn.php';
         h1 {
             color: white;
             text-align: center;
-            margin: 0;
+            margin: 10px 0;
+            font-size: 24px;
+            width: 100%;
         }
 
         .comments-container {
             display: grid;
-            gap: 20px;
+            gap: 15px;
         }
 
         .comment-box {
             background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
+            padding: 15px;
             border-radius: 10px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .read-comments-btn {
     display: inline-block;
-    margin-top: 15px;
-    padding: 10px 20px;
+    margin-top: 10px;
+    padding: 8px 15px;
     background: linear-gradient(45deg, #ff3366, #ff0000);
     color: white;
     text-decoration: none;
@@ -96,14 +101,15 @@ include '../connection/conn.php';
 
         .comment-text {
             color: white;
-            font-size: 16px;
-            line-height: 1.6;
-            margin: 10px 0;
+            font-size: 14px;
+            line-height: 1.4;
+            margin: 8px 0;
+            word-wrap: break-word;
         }
 
         .comment-date {
             color: #888;
-            font-size: 14px;
+            font-size: 12px;
             text-align: right;
         }
 
@@ -112,6 +118,55 @@ include '../connection/conn.php';
             text-align: center;
             padding: 20px;
         }
+
+        /* Media Queries for Responsive Design */
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 10px;
+                margin: 5px auto;
+            }
+
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+
+            .back-btn {
+                margin-bottom: 10px;
+            }
+
+            h1 {
+                font-size: 20px;
+                margin: 5px 0;
+            }
+
+            .comment-box {
+                padding: 10px;
+            }
+
+            .rating-display i {
+                font-size: 16px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            body {
+                padding: 5px;
+            }
+
+            .container {
+                width: 95%;
+            }
+
+            h1 {
+                font-size: 18px;
+            }
+
+            .comment-text {
+                font-size: 13px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -119,11 +174,7 @@ include '../connection/conn.php';
     <section class="home-section">
     <div class="container">
         <div class="header">
-            <a href="about.php?id=<?php echo $id ?>" class="back-btn">
-                <i class="fas fa-arrow-left"></i> Back
-            </a>
             <h1>User Comments</h1>
-            <div style="width: 100px;"></div> <!-- Spacer for centering -->
         </div>
 
         <div class="comments-container">
