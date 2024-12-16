@@ -29,32 +29,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $alert_message = "Invalid input. Please try again.";
     }
 }
-// Fetch all ratings and comments
-$stmt = $conn->prepare("SELECT rate, comment FROM ratings");
+
+// Fetch all ratings for the product and calculate the average rating
+$stmt = $conn->prepare("SELECT rate FROM ratings");
 $stmt->execute();
 $result = $stmt->get_result();
-
-// Store the comments in an array
-$comments = array();
 $total_ratings = 0;
 $rating_count = 0;
 
 while ($row = $result->fetch_assoc()) {
     $total_ratings += $row['rate'];
     $rating_count++;
-    $comments[] = $row['comment']; // Store each comment
 }
 
-// Calculate average rating
+// Calculate the average rating if there are any ratings
 if ($rating_count > 0) {
-    $average_rating = round($total_ratings / $rating_count, 1);
+    $average_rating = round($total_ratings / $rating_count, 1); // Round to one decimal place
 } else {
-    $average_rating = 0;
-}
-
-// Display the comments
-foreach ($comments as $comment) {
-    echo "<p>" . htmlspecialchars($comment) . "</p>";
+    $average_rating = 0; // Set to 0 or some default value when there are no ratings
 }
 
 $stmt->close();
@@ -150,6 +142,21 @@ $stmt->close();
         .rating i:hover {
             transform: scale(1.2);
         }
+        .read-comments-btn {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: linear-gradient(45deg, #ff3366, #ff0000);
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: transform 0.3s ease;
+}
+
+.read-comments-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 51, 102, 0.3);
+}
         .footer {
             margin-top: 30px;
             background: rgba(0, 0, 0, 0.3);
@@ -307,21 +314,6 @@ $stmt->close();
                 height: 70px;
             }
         }
-        .read-comments-btn {
-            display: inline-block;
-            margin-top: 15px;
-            padding: 10px 20px;
-            background: linear-gradient(45deg, #ff3366, #ff0000);
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: transform 0.3s ease;
-        }
-
-        .read-comments-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(255, 51, 102, 0.3);
-        }
     </style>
 </head>
 <body>
@@ -389,7 +381,7 @@ $stmt->close();
                                 }
                             ?>
                         </div>
-                        <a href="view_comments.php?id=<?php echo $id ?>" class="read-comments-btn">Read Comments</a>
+                          <a href="view_comments.php?id=<?php echo $id ?>" class="read-comments-btn">Read Comments</a>
                     </div>
                 </div>
 
@@ -400,7 +392,7 @@ $stmt->close();
                     <i class="fab fa-instagram"></i>
                     <i class="fab fa-youtube"></i>
                 </div>
-                <a href="download.php" style="text-decoration: none;">
+                 <a href="download.php" style="text-decoration: none;">
                 <div class="qr">
                     <p>DOWNLOAD APP NOW</p>
                     <img src="../img/jeepfinderqr.png" alt="JeepFinder QR Code">
