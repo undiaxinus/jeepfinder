@@ -414,6 +414,7 @@
             .table-container {
                 padding: 20px;
                 background: rgba(255, 255, 255, 0.05);
+                width:1250px;
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
             }
@@ -718,7 +719,7 @@
             <div class="header-container">
                 <h2>Users Account</h2>
                 <div class="search-container">
-                    <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search jeepney...">
+                    <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search...">
                 </div>
             </div>
             <div class="border1">

@@ -606,7 +606,7 @@
             data-status="<?php echo htmlspecialchars($c['status']); ?>">
             <div class="d-flex bd-highlight">
                 <div class="img_cont">
-                    <img id="randomImage" src="<?php echo $randomImage; ?>" class="rounded-circle user_img">
+                    <img src="<?php echo !empty($c['profile']) ? '../img/avatar/' . $c['profile'] : '../img/avatar/avatar1.gif'; ?>" class="rounded-circle user_img">
                     <?php
                 $unreadCount = getUnreadMessageCount($c['user'], $sender_id, $conn);
                 if ($c['status'] == "online") {

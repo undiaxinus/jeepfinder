@@ -379,8 +379,10 @@
 
                 .search-container input {
                     width: 150px;
-                    padding: 8px 15px 8px 35px;
+                    padding: 8px 15px 8px 15px;
                     font-size: 13px;
+                    top:-20px;
+                    right:10px;
                 }
 
                 .search-container::before {
@@ -414,6 +416,7 @@
             .table-container {
                 padding: 20px;
                 background: rgba(255, 255, 255, 0.05);
+                width:1250px;
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
             }
@@ -648,7 +651,6 @@
                     grid-template-columns: repeat(2, 1fr); /* 2 columns for mobile */
                     gap: 15px;
                     padding: 15px;
-                    margin: 15px; /* Add even margins around all sides */
                 }
 
                 .card {
@@ -674,15 +676,6 @@
                 .border {
                     gap: 10px;
                     padding: 10px;
-                    margin: 10px;
-                }
-
-                .card h2 {
-                    font-size: 16px;
-                }
-
-                .card p {
-                    font-size: 11px;
                 }
             }
         </style>
@@ -728,7 +721,7 @@
             <div class="header-container">
                 <h2>Account Offline</h2>
                 <div class="search-container">
-                    <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search jeepney...">
+                    <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search...">
                 </div>
             </div>
             <div class="border1">

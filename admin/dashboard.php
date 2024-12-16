@@ -78,7 +78,9 @@ $conn->close();
                 padding: 20px;
             }
             .border1 {
-                margin: 20px 90px;
+                margin: 20px auto;
+                max-width: 1200px;
+                width: 90%;
             }
             a {
                 text-decoration: none;
@@ -422,6 +424,7 @@ $conn->close();
             .table-container {
                 padding: 20px;
                 background: rgba(255, 255, 255, 0.05);
+                width:1250px;
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
             }
@@ -725,7 +728,7 @@ $conn->close();
             <div class="header-container">
                 <h2>Jeepney Monitoring</h2>
                 <div class="search-container">
-                    <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search jeepney...">
+                    <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search...">
                 </div>
             </div>
             <div class="border1">
