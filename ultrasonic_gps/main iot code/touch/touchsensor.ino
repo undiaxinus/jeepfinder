@@ -48,135 +48,240 @@ float lastValidBearing = 0.0;
 bool updateNeeded = false;
 
 unsigned long lastHttpUpdate = 0;
-const unsigned long HTTP_UPDATE_INTERVAL = 1000; // 1 second
+const unsigned long HTTP_UPDATE_INTERVAL = 100; // Reduced to 100ms for faster updates
+
+// Add these touch sensor timing constants
+const int TOUCH_DELAY = 50;      // Reduced from 100ms to 50ms
+const int TOUCH_DURATION = 100;  // Reduced from 200ms to 100ms
+
+// Update these values at the top with other globals
+const int GPS_BAUD_RATE = 115200;  // Increased from 9600 for faster GPS data
+const unsigned long GPS_READ_INTERVAL = 100;  // Reduced to 100ms for more frequent updates
+const int GPS_MAX_AGE = 1000;    // Maximum age of GPS data in milliseconds
+
+// Add these constants at the top
+const unsigned long LORA_CHECK_INTERVAL = 1;  // Check every 1ms
+unsigned long lastLoRaCheck = 0;
+
+// Add these at the top with other globals
+const char* ssid = "AutoConnectAP";  // Your WiFi SSID
+const char* password = "";           // Your WiFi password
+unsigned long lastWiFiCheck = 0;
+const unsigned long WIFI_CHECK_INTERVAL = 5000; // Check WiFi every 5 seconds
+
+// Add at the top with other globals
+bool portalRunning = false;
 
 void setup() {
-    Serial.begin(9600);
+    Serial.begin(115200);
     Serial2.begin(9600, SERIAL_8N1, gpsRxPin, gpsTxPin);
-
-    // Configure touch pins as INPUT
+    
+    // Configure WiFiManager
+    wifiManager.setConfigPortalTimeout(180); // 3 minute timeout
+    wifiManager.setConnectTimeout(30); // 30 seconds connection timeout
+    
+    // Auto connect using saved credentials
+    if(!wifiManager.autoConnect("AutoConnectAP")) {
+        Serial.println("Failed to connect and hit timeout");
+        ESP.restart();
+    }
+    
+    Serial.println("WiFi Connected!");
+    Serial.print("IP: ");
+    Serial.println(WiFi.localIP());
+    
+    // Initialize LoRa with optimized settings
+    SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_SS);
+    LoRa.setPins(LORA_SS, LORA_RST, LORA_DIO0);
+    
+    if (!LoRa.begin(433E6)) {
+        Serial.println("LoRa Failed!");
+        while (1);
+    }
+    
+    // Optimize LoRa settings
+    LoRa.setSpreadingFactor(7);
+    LoRa.setSignalBandwidth(125E3);
+    LoRa.setCodingRate4(5);
+    LoRa.enableCrc();
+    LoRa.setTxPower(20);
+    
     pinMode(touchPin1, INPUT);
     pinMode(touchPin2, INPUT);
     pinMode(buzzerPin, OUTPUT);
     pinMode(batteryPin, INPUT);
+    
+    Serial.println("System Ready!");
+}
 
-    // Initialize WiFi
-    wifiManager.autoConnect("AutoConnectAP");
-
-    // Initialize LoRa
-    SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_SS);
-    LoRa.setPins(LORA_SS, LORA_RST, LORA_DIO0);
-    if (!LoRa.begin(433E6)) {
-        Serial.println("Starting LoRa failed!");
-        while (1);
+void checkWiFiConnection() {
+    if (WiFi.status() != WL_CONNECTED && !portalRunning) {
+        Serial.println("WiFi disconnected, starting portal...");
+        portalRunning = true;
+        
+        // Start config portal with existing wifiManager instance
+        if (!wifiManager.startConfigPortal("AutoConnectAP")) {
+            Serial.println("Failed to connect and hit timeout");
+            delay(3000);
+            ESP.restart();
+        }
+        
+        portalRunning = false;
+        Serial.println("WiFi Reconnected!");
     }
-    Serial.println("LoRa Initializing OK!");
+}
+
+void forceHttpUpdate() {
+    static HTTPClient http;
+    
+    if (WiFi.status() == WL_CONNECTED) {
+        const char* serverUrl = "https://peachpuff-donkey-807602.hostingersite.com/location";
+        
+        String postData = "ID=" + String(DEVICE_1_ADDRESS) + 
+                         "&message=" + String(Slot) + 
+                         "&lat=" + String(gps.location.lat(), 6) + 
+                         "&lon=" + String(gps.location.lng(), 6) + 
+                         "&rotation=" + String(lastValidBearing) +
+                         "&speed=" + String(gps.speed.kmph());
+        
+        http.begin(serverUrl);
+        http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+        http.addHeader("Connection", "keep-alive");
+        
+        Serial.println("Sending HTTP update...");
+        int httpResponseCode = http.POST(postData);
+        
+        if (httpResponseCode > 0) {
+            Serial.println("HTTP Update OK: " + String(httpResponseCode));
+        } else {
+            Serial.println("HTTP Update Failed: " + String(httpResponseCode));
+            checkWiFiConnection(); // Check WiFi if HTTP fails
+        }
+        http.end();
+    } else {
+        checkWiFiConnection();
+    }
 }
 
 void loop() {
-    // First priority: Check for LoRa messages
+    unsigned long currentMillis = millis();
+    static unsigned long lastSendMillis = 0;
+    const unsigned long SEND_INTERVAL = 250;
+
+    // Always check for incoming LoRa messages first
     int packetSize = LoRa.parsePacket();
     if (packetSize) {
-        handleLoRaMessage(packetSize);
-        updateDatabase(DEVICE_1_ADDRESS, String(lastValidBearing));
+        String message = "";
+        int sender = LoRa.read();
+        int receiver = LoRa.read();
+        
+        if (receiver == DEVICE_1_ADDRESS && sender == DEVICE_2_ADDRESS) {
+            while (LoRa.available()) {
+                message += (char)LoRa.read();
+            }
+            Serial.println("Received: " + message);
+
+            if (message == "BUTTON1_PRESSED") {
+                if (Slot > 0) {
+                    Slot--;
+                    triggerBuzzer();
+                    forceHttpUpdate();
+                    
+                    if (Slot == 0) {
+                        sendLoRaMessage(DEVICE_2_ADDRESS, "DATA_FROM_DEVICE_1: Slot=0");
+                    }
+                }
+            } else if (message == "BUTTON2_PRESSED") {
+                Slot++;
+                triggerBuzzer();
+                forceHttpUpdate();
+            }
+        }
     }
 
-    unsigned long currentMillis = millis();
+    // Send LoRa status updates
+    if (currentMillis - lastSendMillis >= SEND_INTERVAL && Slot > 0) {
+        lastSendMillis = currentMillis;
+        
+        LoRa.beginPacket();
+        LoRa.write(DEVICE_1_ADDRESS);
+        LoRa.write(DEVICE_2_ADDRESS);
+        String message = "DATA_FROM_DEVICE_1: Slot=" + String(Slot);
+        LoRa.print(message);
+        LoRa.endPacket(true);
+        
+        Serial.println("Sent: " + message);
+    }
 
-    // Read digital values from TTP223 sensors
+    handleTouchSensors();
+
+    // Handle GPS updates
+    if (Serial2.available()) {
+        if (gps.encode(Serial2.read())) {
+            if (gps.location.isValid() && gps.location.age() < GPS_MAX_AGE) {
+                float currentLat = gps.location.lat();
+                float currentLng = gps.location.lng();
+                float currentBearing = gps.course.deg();
+                
+                if (currentLat != previousLat || 
+                    currentLng != previousLng || 
+                    currentBearing != previousBearing) {
+                    
+                    previousLat = currentLat;
+                    previousLng = currentLng;
+                    previousBearing = currentBearing;
+                    lastValidBearing = currentBearing;
+                    forceHttpUpdate();
+                }
+            }
+        }
+    }
+}
+
+void handleTouchSensors() {
     int touch1 = digitalRead(touchPin1);
     int touch2 = digitalRead(touchPin2);
-    
-    // Debug prints
-    Serial.print("Touch1: ");
-    Serial.print(touch1);
-    Serial.print(" Touch2: ");
-    Serial.println(touch2);
 
-    // Handle passenger detection
     if (touch1 == HIGH && touch2 == HIGH) {
-        // Both sensors touched simultaneously, ignore
         Serial.println("Both touched - ignoring");
     } else if (touch1 == HIGH) {
-        Serial.println("Touch1 activated");
         if (!leftDetected) {
-            Serial.println("Incrementing Slot");
-            Slot++;
-            leftDetected = true;
-            rightDetected = false;
-            triggerBuzzer();
-            updateDatabase(DEVICE_1_ADDRESS, String(lastValidBearing));
+            if (digitalRead(touchPin1) == HIGH) {
+                Serial.println("Touch 1 detected - Incrementing Slot");
+                Slot++;
+                leftDetected = true;
+                rightDetected = false;
+                triggerBuzzer();
+                forceHttpUpdate();  // Immediate update
+            }
         }
     } else if (touch2 == HIGH) {
-        Serial.println("Touch2 activated");
         if (!rightDetected && Slot > 0) {
-            Serial.println("Decrementing Slot");
-            Slot--;
-            leftDetected = false;
-            rightDetected = true;
-            triggerBuzzer();
-            updateDatabase(DEVICE_1_ADDRESS, String(lastValidBearing));
-            
-            if (Slot == 0) {
-                sendLoRaMessage(DEVICE_2_ADDRESS, "DATA_FROM_DEVICE_1: Slot=0");
+            if (digitalRead(touchPin2) == HIGH) {
+                Serial.println("Touch 2 detected - Decrementing Slot");
+                Slot--;
+                leftDetected = false;
+                rightDetected = true;
+                triggerBuzzer();
+                forceHttpUpdate();  // Immediate update
+                
+                if (Slot == 0) {
+                    sendLoRaMessage(DEVICE_2_ADDRESS, "DATA_FROM_DEVICE_1: Slot=0");
+                }
             }
         }
     } else {
         leftDetected = false;
         rightDetected = false;
     }
-
-    // Debug print for Slot value
-    Serial.print("Current Slot: ");
-    Serial.println(Slot);
-
-    // Third priority: GPS updates
-    handleGPS();
-
-    // Fourth priority: Regular LoRa updates
-    if (currentMillis - previousMillis >= interval && Slot > 0) {
-        previousMillis = currentMillis;
-        sendLoRaMessage(DEVICE_2_ADDRESS, "DATA_FROM_DEVICE_1: Slot=" + String(Slot));
-    }
-}
-
-void handleLoRaMessage(int packetSize) {
-    int sender = LoRa.read();
-    int receiver = LoRa.read();
-    
-    if (receiver == DEVICE_1_ADDRESS && sender == DEVICE_2_ADDRESS) {
-        String message = "";
-        while (LoRa.available()) {
-            message += (char)LoRa.read();
-        }
-        Serial.println("Received message: " + message);
-
-        // Process button commands from Device 2
-        if (message == "BUTTON1_PRESSED") {
-            if (Slot > 0) {
-                Slot--;
-                triggerBuzzer();
-                // Update HTTP immediately after Slot changes
-                updateDatabase(DEVICE_1_ADDRESS, String(lastValidBearing));
-                if (Slot == 0) {
-                    sendLoRaMessage(DEVICE_2_ADDRESS, "DATA_FROM_DEVICE_1: Slot=0");
-                }
-            }
-        } else if (message == "BUTTON2_PRESSED") {
-            Slot++;
-            triggerBuzzer();
-            // Update HTTP immediately after Slot changes
-            updateDatabase(DEVICE_1_ADDRESS, String(lastValidBearing));
-        }
-    }
 }
 
 void triggerBuzzer() {
-    for (int i = 0; i < 5; i++) { // Sound the buzzer for a short burst
+    for (int i = 0; i < 2; i++) { // Reduced from 5 to 2 beeps
         digitalWrite(buzzerPin, HIGH);
-        delay(100);
+        delay(50);  // Reduced from 100ms to 50ms
         digitalWrite(buzzerPin, LOW);
-        delay(100);
+        delay(50);  // Reduced from 100ms to 50ms
     }
 }
 
@@ -189,35 +294,30 @@ int calculateBatteryPercentage(float voltage) {
 }
 
 void updateDatabase(int id, const String& value) {
-    unsigned long currentTime = millis();
-    
-    // Only attempt update if enough time has passed since last update
-    if (currentTime - lastHttpUpdate < HTTP_UPDATE_INTERVAL) {
-        return;
-    }
-    
     if (WiFi.status() == WL_CONNECTED) {
         HTTPClient http;
         const char* serverUrl = "https://peachpuff-donkey-807602.hostingersite.com/location";
         int currentSlot = (Slot > 0) ? Slot : 0;
+        
         String postData = "ID=" + String(id) + 
                          "&message=" + String(currentSlot) + 
                          "&lat=" + String(gps.location.lat(), 6) + 
                          "&lon=" + String(gps.location.lng(), 6) + 
-                         "&rotation=" + String(lastValidBearing);
-        
-        if (gps.speed.isValid()) {
-            postData += "&speed=" + String(gps.speed.kmph());
-        }
+                         "&rotation=" + String(lastValidBearing) +
+                         "&speed=" + String(gps.speed.kmph());
         
         http.begin(serverUrl);
         http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+        http.addHeader("Cache-Control", "no-cache");
+        
+        Serial.println("Updating database - Slot: " + String(currentSlot));
+        
         int httpResponseCode = http.POST(postData);
         
         if (httpResponseCode > 0) {
-            Serial.print("HTTP Response code: ");
-            Serial.println(httpResponseCode);
-            lastHttpUpdate = currentTime; // Update timestamp only on successful request
+            Serial.println("HTTP Update successful - Response code: " + String(httpResponseCode));
+        } else {
+            Serial.println("HTTP Update failed - Error: " + String(httpResponseCode));
         }
         http.end();
     }
@@ -238,18 +338,33 @@ void sendLoRaMessage(int receiverAddress, const String& message) {
 void handleGPS() {
     unsigned long currentMillis = millis();
     
-    if (currentMillis - previousGPSMillis >= gpsInterval) {
+    if (currentMillis - previousGPSMillis >= GPS_READ_INTERVAL) {
         previousGPSMillis = currentMillis;
         
-        while (Serial2.available() > 0) {
+        // Read GPS data more aggressively
+        while (Serial2.available()) {
             if (gps.encode(Serial2.read())) {
-                if (gps.location.isValid() && gps.course.isValid()) {
+                if (gps.location.isValid() && gps.location.age() < GPS_MAX_AGE) {
                     float currentLat = gps.location.lat();
                     float currentLng = gps.location.lng();
                     float currentBearing = gps.course.deg();
+                    float currentSpeed = gps.speed.kmph();
                     
-                    // If GPS data changed, update HTTP immediately
-                    if (currentLat != previousLat || 
+                    // Force update if speed is above threshold or location changed significantly
+                    bool significantChange = false;
+                    
+                    // Check for significant movement (more than 5 meters)
+                    if (previousLat != 0 && previousLng != 0) {
+                        float distance = TinyGPSPlus::distanceBetween(
+                            previousLat, previousLng,
+                            currentLat, currentLng
+                        );
+                        
+                        significantChange = (distance > 5) || (currentSpeed > 5);
+                    }
+                    
+                    if (significantChange || 
+                        currentLat != previousLat || 
                         currentLng != previousLng || 
                         currentBearing != previousBearing) {
                         
@@ -262,9 +377,11 @@ void handleGPS() {
                         Serial.println("GPS Update:");
                         Serial.print("Lat: "); Serial.println(currentLat, 6);
                         Serial.print("Lng: "); Serial.println(currentLng, 6);
+                        Serial.print("Speed (km/h): "); Serial.println(currentSpeed);
                         Serial.print("Bearing: "); Serial.println(currentBearing);
+                        Serial.print("Fix Age (ms): "); Serial.println(gps.location.age());
                         
-                        // Update database immediately when GPS data changes
+                        // Force immediate database update
                         updateDatabase(DEVICE_1_ADDRESS, String(lastValidBearing));
                     }
                 }

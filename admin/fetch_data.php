@@ -31,6 +31,7 @@ if ($result->num_rows > 0) {
         }
 
         echo "<tr>
+            <td>{$row['ID']}</td>
             <td class='driver-info'>
                 <div class='info-row'>Driver's name: {$row['drivername']}</div>
                 <div class='info-row'>Address: {$row['address']}</div>
@@ -40,7 +41,7 @@ if ($result->num_rows > 0) {
                 <div class='info-row'>Route: {$row['route']}</div>
             </td>
             <td class='jeepney-info'>
-                <div class='info-row'>Passengers: {$row['passenger']}</div>
+                <div class='info-row'>Passengers: {$row['passenger']}/{$row['capacity']}</div>
                 <div class='info-row'>Location: {$row['latitude']},{$row['longitude']}</div>
                 <div class='info-row'>Response: {$row['resdate']}</div>
                 <div class='info-row'>Current: {$date}</div>

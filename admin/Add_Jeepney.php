@@ -14,11 +14,12 @@ if(isset($_POST['submit'])) {
     $address = $_POST['street_number'] . ', ' . $_POST['floor_unit'] . ', ' . $_POST['street_name'] . ', ' . $_POST['city'] . ', ' . $_POST['province'] . ', ' . $_POST['postal_code'];
     $pnumber = $_POST['plate_number'];
     $route = $_POST['route'];
+    $passenger_capacity = $_POST['passenger_capacity'];
     $company_name = $_POST['company_name'];
     $jeepicons = ['jeeps2.png','jeeep.png','jeepsv.png','jeepsy.png','jeepsy1.png','jeepsy2.png','jeepsy3.png','jeepsys.png','jeepsy4.png'];
     $jeepicon = $jeepicons[array_rand($jeepicons)];
-    $sql = "INSERT INTO `locate`(`drivername`, `cnumber`, `platenumber`, `route`, `jeepicon`, `address`, `company_name`) VALUES ('$name','$number','$pnumber','$route','$jeepicon','$address','$company_name')";
-    
+        $sql = "INSERT INTO `locate`(`drivername`, `cnumber`, `platenumber`, `route`, `jeepicon`, `address`, `company_name`, `capacity`) VALUES ('$name','$number','$pnumber','$route','$jeepicon','$address','$company_name','$passenger_capacity')";
+        
     if ($conn->query($sql) === TRUE) {
         $insertSuccess = true;
     } else {
@@ -269,6 +270,10 @@ if(isset($_POST['submit'])) {
                     <div class="form-group">
                         <label class="form-label">Plate number</label>
                         <input type="text" name="plate_number" required="required" class="form-control"/>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Passenger Capacity</label>
+                        <input type="text" name="passenger_capacity" required="required" class="form-control"/>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Route</label>

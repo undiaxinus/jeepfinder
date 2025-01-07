@@ -20,8 +20,9 @@ if(isset($_POST['submit'])) {
     $company_name = $conn->real_escape_string($_POST['company_name']);
     $jeepicons = ['jeeps2.png','jeeep.png','jeepsv.png','jeepsy.png','jeepsy1.png','jeepsy2.png','jeepsy3.png','jeepsys.png','jeepsy4.png'];
     $jeepicon = $jeepicons[array_rand($jeepicons)];
+    $passenger_capacity = $conn->real_escape_string($_POST['passenger_capacity']);
 
-    $sql = "UPDATE `locate` SET `drivername`='$name', `cnumber`='$number', `platenumber`='$pnumber', `route`='$route', `jeepicon`='$jeepicon', `address`='$address', `company_name`='$company_name' WHERE `ID`='$ids'";
+    $sql = "UPDATE `locate` SET `drivername`='$name', `cnumber`='$number', `platenumber`='$pnumber', `route`='$route', `jeepicon`='$jeepicon', `address`='$address', `company_name`='$company_name', `capacity`='$passenger_capacity' WHERE `ID`='$ids'";
     
     if ($conn->query($sql) === TRUE) {
         $updateSuccess = true;
@@ -48,6 +49,7 @@ if (isset($_GET['ids'])) {
         $province = $address_parts[4] ?? '';
         $postal_code = $address_parts[5] ?? '';
         $pnumber = $row['platenumber'];
+        $passenger_capacity = $row['capacity'];
         $route = $row['route'];
         $company_name = $row['company_name'];
     } else {
@@ -313,6 +315,10 @@ if (isset($_GET['ids'])) {
                     <div class="form-group">
                         <label class="form-label">Plate number</label>
                         <input type="text" name="plate_number" required="required" value="<?php echo $pnumber; ?>" class="form-control"/>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Passenger Capacity</label>
+                        <input type="text" name="passenger_capacity" required="required" value="<?php echo $passenger_capacity; ?>" class="form-control"/>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Route</label>

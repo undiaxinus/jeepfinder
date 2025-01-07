@@ -372,6 +372,7 @@ document.head.appendChild(style);
                 var longitude = data[i].longitude;
                 var speed = data[i].speed;
                 var passengerCount = data[i].passenger;
+                var capacity = data[i].capacity;
                 var rotate = data[i].rotation;
                 var jeep = data[i].jeep;
 
@@ -400,7 +401,8 @@ document.head.appendChild(style);
                     icon: markerIcon,
                     plateNumber: plateNumber,
                     route: route,
-                    passengerCount: passengerCount
+                    passengerCount: passengerCount,
+                    capacity: capacity
                 }).addTo(map);
 
                 // Use the user's last known location if location services are off
@@ -419,7 +421,7 @@ document.head.appendChild(style);
                 var distanceToUser = calculateDistance(latitude, longitude, userLat, userLng);
                 var { hours, minutes } = calculateETAWithSpeed(distanceToUser, speed);
                 
-                marker.bindPopup("<b>Plate#: " + plateNumber + "</b><br>Route: " + route + "<br>Passenger: " + passengerCount + "/25" + "<br>Distance to User: " + distanceToUser.toFixed(2) + " km" + "<br>Speed: " + speed + " km/h" + "<br>ETA: " + hours + " hours " + minutes + " minutes", { autoClose: false });
+                marker.bindPopup("<b>Plate#: " + plateNumber + "</b><br>Route: " + route + "<br>Passenger: " + passengerCount + "/" + capacity + "<br>Distance to User: " + distanceToUser.toFixed(2) + " km" + "<br>Speed: " + speed + " km/h" + "<br>ETA: " + hours + " hours " + minutes + " minutes", { autoClose: false });
 
                 if (currentPlateNumber === plateNumber) {
                     marker.fireEvent('click');
@@ -434,7 +436,7 @@ document.head.appendChild(style);
                     currentPlateNumber = e.target.options.plateNumber;
                     var distanceToUser = calculateDistance(e.target.getLatLng().lat, e.target.getLatLng().lng, userLat, userLng);
                     var { hours, minutes } = calculateETAWithSpeed(distanceToUser, speed);
-                    e.target.setPopupContent("<b>Plate#: " + currentPlateNumber + "</b><br>Route: " + e.target.options.route + "<br>Passenger: " + e.target.options.passengerCount + "/25" + "<br>Distance to User: " + distanceToUser.toFixed(2) + " km" + "<br>Speed: " + speed + " km/h" + "<br>ETA: " + hours + " hours " + minutes + " minutes");
+                    e.target.setPopupContent("<b>Plate#: " + currentPlateNumber + "</b><br>Route: " + e.target.options.route + "<br>Passenger: " + e.target.options.passengerCount + "/" + e.target.options.capacity + "<br>Distance to User: " + distanceToUser.toFixed(2) + " km" + "<br>Speed: " + speed + " km/h" + "<br>ETA: " + hours + " hours " + minutes + " minutes");
                     
                     calculateRouteToUser(e.target.getLatLng())
                         .then(route => {

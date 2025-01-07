@@ -13,6 +13,7 @@
                 'longitude' => $row['longitude'],
                 'speed' => $row['speed'],
                 'passenger' => $row['passenger'],
+                'capacity' => $row['capacity'],
                 'rotation' => $row['rotation'],
                 'jeep' => $row['jeepicon']
             );
