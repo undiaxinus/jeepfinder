@@ -1,13 +1,114 @@
 <?php
-//signup.php function
+session_start();
 include_once("connection/connect.php");
 $conn = connection();
 $rand = uniqid('user_', true);
 $hashedRand = hash('sha256', $rand);
-$emailExists = false; // Flag to check if email already exists
-$insertSuccess = false; // Flag to check if insertion was successful
+
+// Add PHPMailer
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
+require 'vendor/autoload.php';
+
+// Function to send OTP
+function sendOTP($email, $otp) {
+    $mail = new PHPMailer(true);
+
+    try {
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'undiaxinus@gmail.com'; // Your email
+        $mail->Password = 'ptjihcapoaqbrily'; // Your app password
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
+
+        $mail->setFrom('undiaxinus@gmail.com', 'SABAT MO');
+        $mail->addAddress($email);
+
+        $mail->isHTML(true);
+        $mail->Subject = 'Email Verification OTP';
+        $mail->Body = "Your OTP for email verification is: <b>$otp</b>";
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+if(isset($_POST['action']) && $_POST['action'] === 'send_otp') {
+    $email = $_POST['email'];
+    
+    // Check if email already exists
+    $checkEmailQuery = "SELECT * FROM `user` WHERE `email`='$email'";
+    $result = $conn->query($checkEmailQuery);
+
+    if ($result->num_rows > 0) {
+        echo json_encode(['success' => false, 'message' => 'Email already exists']);
+        exit;
+    }
+
+    // Generate OTP
+    $otp = rand(100000, 999999);
+    $_SESSION['signup_otp'] = $otp;
+    $_SESSION['signup_otp_time'] = time();
+    $_SESSION['signup_email'] = $email;
+
+    if (sendOTP($email, $otp)) {
+        echo json_encode(['success' => true]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to send OTP']);
+    }
+    exit;
+}
+
+if(isset($_POST['action']) && $_POST['action'] === 'verify_otp') {
+    $entered_otp = $_POST['otp'];
+    
+    if (!isset($_SESSION['signup_otp']) || !isset($_SESSION['signup_otp_time'])) {
+        echo json_encode(['success' => false, 'message' => 'No OTP found. Please request a new one.']);
+        exit;
+    }
+    
+    if ((time() - $_SESSION['signup_otp_time']) > 600) {
+        unset($_SESSION['signup_otp']);
+        unset($_SESSION['signup_otp_time']);
+        echo json_encode(['success' => false, 'message' => 'OTP has expired. Please request a new one.']);
+        exit;
+    }
+    
+    if ($entered_otp == $_SESSION['signup_otp']) {
+        // OTP is valid
+        $_SESSION['otp_verified'] = true;
+        unset($_SESSION['signup_otp']);
+        unset($_SESSION['signup_otp_time']);
+        echo json_encode(['success' => true]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Invalid OTP']);
+    }
+    exit;
+}
 
 if(isset($_POST['submit'])) {
+    // Check if OTP was verified
+    if (!isset($_SESSION['otp_verified']) || $_SESSION['otp_verified'] !== true) {
+        echo "<script>
+            Swal.fire({
+                title: 'Error',
+                text: 'Please verify your email with OTP first!',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        </script>";
+        exit();
+    }
+
+    // Clear OTP verification flag
+    unset($_SESSION['otp_verified']);
+    
     // Retrieve form data
     $fname = $_POST['fname'];
     $mname = $_POST['mname'];
@@ -21,11 +122,11 @@ if(isset($_POST['submit'])) {
     // Check if passwords match
     if($pass !== $confirm_pass) {
         echo "<script>
-            swal({
+            Swal.fire({
                 title: 'Error',
                 text: 'Passwords don\'t match!',
                 icon: 'error',
-                button: 'OK',
+                confirmButtonText: 'OK'
             });
         </script>";
         exit();
@@ -37,18 +138,44 @@ if(isset($_POST['submit'])) {
     $result = $conn->query($checkEmailQuery);
 
     if ($result->num_rows > 0) {
-        // Set flag to true if email already exists
-        $emailExists = true;
+        echo "<script>
+            Swal.fire({
+                title: 'Error',
+                text: 'Email already exists. Please try another email.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        </script>";
+        exit();
+    }
+
+    // Proceed with inserting the new user
+    $sql = "INSERT INTO `user`(`fname`,`mname`,`lname`, `email`, `user`, `password`, `account`) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sssssss", $fname, $mname, $lname, $email, $user, $hashedPassword, $account);
+    
+    if ($stmt->execute()) {
+        echo "<script>
+            Swal.fire({
+                title: 'Success',
+                text: 'Your account has been successfully created!',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                window.location.href = 'login.php';
+            });
+        </script>";
+        exit();
     } else {
-        // Proceed with inserting the new user if email doesn't exist
-        $sql = "INSERT INTO `user`(`fname`,`mname`,`lname`, `email`, `user`, `password`, `account`) VALUES ('$fname','$mname','$lname','$email','$user','$hashedPassword','$account')";
-        
-        if ($conn->query($sql) === TRUE) {
-            // Set flag to true if insertion was successful
-            $insertSuccess = true;
-        } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
-        }
+        echo "<script>
+            Swal.fire({
+                title: 'Error',
+                text: 'Failed to create account: " . $conn->error . "',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        </script>";
+        exit();
     }
 }
 ?>
@@ -483,8 +610,171 @@ $('.btn').click(function(){
     });
 <?php endif; ?>
 
-// Password validation
+// Replace all existing form submission handlers with this single one
 $(document).ready(function() {
+    $('form').on('submit', function(e) {
+        e.preventDefault();
+        
+        // Validate passwords first
+        const password = $('#password').val();
+        const confirmPassword = $('#confirm_password').val();
+
+        if (password !== confirmPassword) {
+            Swal.fire({
+                title: "Error",
+                text: "Passwords don't match!",
+                icon: "error",
+                confirmButtonText: "OK"
+            });
+            return false;
+        }
+
+        const email = $('#email').val();
+        const form = this;
+
+        // Show loading state
+        Swal.fire({
+            title: 'Sending OTP',
+            text: 'Please wait...',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        // Send OTP
+        fetch(window.location.href, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                'action': 'send_otp',
+                'email': email
+            }).toString()
+        })
+        .then(response => response.json())
+        .then(data => {
+            Swal.close();
+            
+            if (data.success) {
+                // Ask for OTP
+                Swal.fire({
+                    title: 'Enter OTP',
+                    text: 'Please enter the OTP sent to your email',
+                    input: 'text',
+                    inputAttributes: {
+                        autocapitalize: 'off',
+                        maxlength: 6,
+                        autocomplete: 'off',
+                        pattern: '[0-9]*'
+                    },
+                    showCancelButton: true,
+                    confirmButtonText: 'Verify',
+                    showLoaderOnConfirm: true,
+                    backdrop: true,
+                    preConfirm: async (otp) => {
+                        if (!otp) {
+                            Swal.showValidationMessage('Please enter OTP');
+                            return false;
+                        }
+                        try {
+                            const response = await fetch(window.location.href, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                body: new URLSearchParams({
+                                    'action': 'verify_otp',
+                                    'otp': otp
+                                }).toString()
+                            });
+                            const data = await response.json();
+                            if (!data.success) {
+                                throw new Error(data.message || 'Invalid OTP');
+                            }
+                            return data;
+                        } catch (error) {
+                            Swal.showValidationMessage(error.message);
+                            return false;
+                        }
+                    },
+                    allowOutsideClick: () => !Swal.isLoading()
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Show loading while submitting form
+                        Swal.fire({
+                            title: 'Creating Account',
+                            text: 'Please wait...',
+                            allowOutsideClick: false,
+                            showConfirmButton: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        // Create FormData from the form
+                        const formData = new FormData(form);
+                        formData.append('submit', '1');
+
+                        // Submit form data using fetch
+                        fetch(window.location.href, {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.text())
+                        .then(html => {
+                            // Check if registration was successful
+                            if (html.includes('successfully created')) {
+                                Swal.fire({
+                                    title: 'Success',
+                                    text: 'Your account has been successfully created!',
+                                    icon: 'success',
+                                    confirmButtonText: 'OK'
+                                }).then(() => {
+                                    window.location.href = 'login.php';
+                                });
+                            } else {
+                                // Show error if registration failed
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: 'Failed to create account. Please try again.',
+                                    icon: 'error',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'An error occurred while creating your account',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        });
+                    }
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message || 'Failed to send OTP'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred while sending OTP'
+            });
+        });
+    });
+
+    // Password validation
     $('#confirm_password').on('keyup', function() {
         const password = $('#password').val();
         const confirmPassword = $(this).val();
@@ -506,116 +796,6 @@ $(document).ready(function() {
     $('#password').on('keyup', function() {
         if ($('#confirm_password').val() !== '') {
             $('#confirm_password').trigger('keyup');
-        }
-    });
-
-    // Form submission validation
-    $('form').on('submit', function(e) {
-        const password = $('#password').val();
-        const confirmPassword = $('#confirm_password').val();
-
-        if (password !== confirmPassword) {
-            e.preventDefault();
-            swal({
-                title: "Error",
-                text: "Passwords don't match!",
-                icon: "error",
-                button: "OK",
-            });
-        }
-    });
-});
-
-password.onchange = validatePassword;
-confirm_password.onkeyup = validatePassword;
-
-// Update your form submission
-$('form').on('submit', function(e) {
-    if(password.value != confirm_password.value) {
-        e.preventDefault();
-        swal({
-            title: "Error",
-            text: "Passwords don't match!",
-            icon: "error",
-            button: "OK",
-        });
-    }
-});
-
-// Form validation for all inputs
-$(document).ready(function() {
-    // Name validation function
-    function validateName(input) {
-        const value = input.val();
-        const messageElement = input.siblings('.form-message');
-        
-        if (value === '' && input.prop('required')) {
-            messageElement.text('Please fill out this field.');
-            input.removeClass('valid').addClass('invalid');
-            return false;
-        } else if (value.length < 2 && value !== '') {
-            messageElement.text('Must be at least 2 characters');
-            input.removeClass('valid').addClass('invalid');
-            return false;
-        } else if (!/^[a-zA-Z\s]*$/.test(value) && value !== '') {
-            messageElement.text('Only letters allowed');
-            input.removeClass('valid').addClass('invalid');
-            return false;
-        } else if (value !== '') {
-            messageElement.text('');
-            input.removeClass('invalid').addClass('valid');
-            return true;
-        } else {
-            messageElement.text('');
-            input.removeClass('valid invalid');
-            return true;
-        }
-    }
-
-    // Email validation function
-    function validateEmail(input) {
-        const value = input.val();
-        const messageElement = input.siblings('.form-message');
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        
-        if (value === '') {
-            messageElement.text('Please fill out this field');
-            input.removeClass('valid').addClass('invalid');
-            return false;
-        } else if (!emailRegex.test(value)) {
-            messageElement.text('Please include an \'@\' in the email address');
-            input.removeClass('valid').addClass('invalid');
-            return false;
-        } else {
-            messageElement.text('');
-            input.removeClass('invalid').addClass('valid');
-            return true;
-        }
-    }
-
-    // Attach validation to input events
-    $('#fname, #lname').on('input', function() {
-        validateName($(this));
-    });
-
-    $('#mname').on('input', function() {
-        if ($(this).val() !== '') {
-            validateName($(this));
-        } else {
-            $(this).siblings('.form-message').text('');
-            $(this).removeClass('valid invalid');
-        }
-    });
-
-    $('#email').on('input', function() {
-        validateEmail($(this));
-    });
-
-    // Add blur event for empty field validation
-    $('input[required]').on('blur', function() {
-        if ($(this).val() === '') {
-            $(this).addClass('invalid');
-            $(this).siblings('.form-message').text('Please fill out this field.');
         }
     });
 });
@@ -643,4 +823,7 @@ document.addEventListener('mousemove', function(event) {
     });
 });
 </script>
+<!-- Add SweetAlert2 -->
+<link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </html>
