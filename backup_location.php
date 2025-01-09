@@ -1,6 +1,88 @@
 <?php
+session_start();
 
 include_once 'connection/conn.php';
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
+require 'vendor/autoload.php'; // Make sure you have PHPMailer installed via composer
+
+// Add this function for sending OTP
+function sendOTP($email, $otp) {
+    $mail = new PHPMailer(true);
+
+    try {
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com'; // Replace with your SMTP host
+        $mail->SMTPAuth = true;
+        $mail->Username = 'undiaxinus@gmail.com'; // Replace with your email
+        $mail->Password = 'ptjihcapoaqbrily'; // Replace with your app password
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
+
+        $mail->setFrom('undiaxinus@gmail.com', 'Location Tracker');
+        $mail->addAddress($email);
+
+        $mail->isHTML(true);
+        $mail->Subject = 'Device ID Verification OTP';
+        $mail->Body = "Your OTP for device verification is: <b>$otp</b>";
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+// Add this endpoint to handle OTP verification
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
+    if ($_POST['action'] === 'send_otp') {
+        $device_id = $_POST['device_id'];
+        $sql = "SELECT email FROM locate WHERE ID = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $device_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($row = $result->fetch_assoc()) {
+            $otp = rand(100000, 999999);
+            $_SESSION['otp'] = $otp;
+            $_SESSION['device_id'] = $device_id;
+            $_SESSION['otp_time'] = time(); // Add timestamp for OTP expiration
+            
+            if (sendOTP($row['email'], $otp)) {
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Failed to send OTP']);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Device ID not found']);
+        }
+        exit;
+    }
+
+    if ($_POST['action'] === 'verify_otp') {
+        $entered_otp = $_POST['otp'];
+        
+        // Check if OTP session exists and hasn't expired (10 minutes expiration)
+        if (isset($_SESSION['otp']) && isset($_SESSION['otp_time']) && 
+            (time() - $_SESSION['otp_time']) <= 600) {
+            
+            if ($entered_otp == $_SESSION['otp']) {
+                // OTP is valid
+                unset($_SESSION['otp']);
+                unset($_SESSION['otp_time']);
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Invalid OTP']);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'OTP has expired or is invalid']);
+        }
+        exit;
+    }
+}
 
 // Check if form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['latitude'])) {
@@ -223,8 +305,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['latitude'])) {
         .dark-mode .btn-close {
             filter: invert(1) grayscale(100%) brightness(200%);
         }
+
+        .modal-content {
+            background-color: #fff;
+            border-radius: 15px;
+        }
+
+        #otpInput {
+            letter-spacing: 2px;
+            font-size: 20px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .dark-mode #otpInput {
+            background-color: #333;
+            color: #fff;
+            border-color: #444;
+        }
+
+        .dark-mode #otpInput:focus {
+            background-color: #444;
+            border-color: #555;
+            color: #fff;
+        }
     </style>
     <link rel="manifest" href="manifest.json">
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <div class="modal fade" id="customAlert" tabindex="-1" aria-hidden="true">
@@ -496,12 +604,142 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['latitude'])) {
         function saveDeviceId() {
             const deviceId = document.getElementById('deviceId').value;
             if (deviceId) {
-                localStorage.setItem('deviceId', deviceId);
-                document.getElementById('deviceId').readOnly = true;
-                showCustomAlert('Device ID saved successfully!');
+                // Show loading state
+                Swal.fire({
+                    title: 'Sending OTP',
+                    text: 'Please wait...',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    willOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                // Send request to generate and send OTP
+                fetch(window.location.href, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        'action': 'send_otp',
+                        'device_id': deviceId
+                    }).toString()
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Ask for OTP using SweetAlert2
+                        Swal.fire({
+                            title: 'Enter OTP',
+                            text: 'Please enter the OTP sent to your email',
+                            input: 'text',
+                            inputAttributes: {
+                                autocapitalize: 'off',
+                                maxlength: 6,
+                                autocomplete: 'off',
+                                pattern: '[0-9]*'
+                            },
+                            showCancelButton: true,
+                            confirmButtonText: 'Verify',
+                            showLoaderOnConfirm: true,
+                            backdrop: true,
+                            preConfirm: (otp) => {
+                                if (!otp) {
+                                    Swal.showValidationMessage('Please enter OTP');
+                                    return false;
+                                }
+                                return otp;
+                            },
+                            allowOutsideClick: () => !Swal.isLoading()
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                verifyOTP(result.value);
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'Failed to send OTP'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while sending OTP'
+                    });
+                });
             } else {
-                showCustomAlert('Please enter a Device ID');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Missing Device ID',
+                    text: 'Please enter a Device ID'
+                });
             }
+        }
+
+        function verifyOTP(otp) {
+            Swal.fire({
+                title: 'Verifying OTP',
+                text: 'Please wait...',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            const deviceId = document.getElementById('deviceId').value;
+
+            fetch(window.location.href, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    'action': 'verify_otp',
+                    'otp': otp
+                }).toString()
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Save device ID and make input readonly
+                    localStorage.setItem('deviceId', deviceId);
+                    document.getElementById('deviceId').readOnly = true;
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Device ID verified and saved successfully!',
+                        showConfirmButton: true
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Verification Failed',
+                        text: data.message || 'Invalid OTP',
+                        showConfirmButton: true,
+                        confirmButtonText: 'Try Again',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            saveDeviceId(); // Allow retry
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while verifying OTP'
+                });
+            });
         }
 
         function editDeviceId() {
@@ -524,5 +762,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['latitude'])) {
             alertModal.show();
         }
     </script>
+
+    <!-- Add these before closing </body> tag -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
 </body>
 </html>
