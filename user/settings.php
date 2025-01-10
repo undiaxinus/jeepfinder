@@ -86,6 +86,8 @@ if (isset($_POST['submit'])) {
     
     if ($stmt->execute()) {
         $updateSuccess = true;
+        header("Location: settings.php?id=" . $id . "&success=true");
+        exit();
     } else {
         echo "Error: " . $stmt->error;
     }
@@ -98,6 +100,8 @@ if (isset($_POST['submit'])) {
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>SABAT MO</title>
+        <link rel="icon" type="image/png" href="../img/sbmo.png" sizes="32x32">
+    <link rel="shortcut icon" type="image/png" href="../img/sbmo.png">
         <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
         <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
         <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
@@ -350,6 +354,19 @@ if (isset($_POST['submit'])) {
                     window.location.href = "settings.php?id=<?php echo $id ?>";
                 });
             <?php endif; ?>
+
+            // Check URL parameter and show alert
+            document.addEventListener('DOMContentLoaded', function() {
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('success') === 'true') {
+                    Swal.fire({
+                        title: "Success!",
+                        text: "User information has been successfully updated.",
+                        icon: "success",
+                        confirmButtonText: "OK"
+                    });
+                }
+            });
         </script>
         <script>
             document.addEventListener('contextmenu', function (event) {

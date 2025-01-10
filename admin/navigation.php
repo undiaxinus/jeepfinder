@@ -55,9 +55,11 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8">
-    <title>SABAT MO</title>
+    <title>SABAT MO!</title>
+    <link rel="icon" type="image/png" href="../img/sbmo.png">
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
   </head>
   <style type="text/css">
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');

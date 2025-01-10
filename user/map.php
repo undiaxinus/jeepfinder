@@ -11,6 +11,8 @@ header('Location: ../index.html?error=Access denied');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SABAT MO</title>
+    <link rel="icon" type="image/png" href="../img/sbmo.png" sizes="32x32">
+    <link rel="shortcut icon" type="image/png" href="../img/sbmo.png">
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
