@@ -1,4 +1,3 @@
-
 <?php 
 session_start();
 if ($_SESSION['Role'] != 'admin') {
@@ -315,13 +314,15 @@ if (isset($_POST['submit'])) {
                 $('form').removeClass('up')
             });
             <?php if ($updateSuccess): ?>
-                swal({
+                Swal.fire({
                     title: "Success",
                     text: "User information has been successfully updated.",
                     icon: "success",
-                    confirmButtonText: "OK",
-                }).then(function(){
-                    window.location.href = "users.php?id=<?php echo $id ?>";
+                    confirmButtonText: "OK"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "users.php?id=<?php echo $id ?>";
+                    }
                 });
             <?php endif; ?>
         </script>

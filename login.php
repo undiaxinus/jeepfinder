@@ -312,6 +312,23 @@ if (isset($_POST['submit'])) {
             width: 250px;
         }
     }
+
+    .forgot-password {
+        text-align: right;
+        margin-bottom: 15px;
+        margin-right: 15px;
+    }
+
+    .forgot-password a {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .forgot-password a:hover {
+        color: #4776E6;
+    }
 </style>
 <body>
   
@@ -339,6 +356,9 @@ if (isset($_POST['submit'])) {
     <div class="form-group">
         <input id="password" type="password" name="password" required="required" class="form-control" placeholder="Enter your password"/>
         <label class="form-label">Password</label>
+    </div>
+    <div class="forgot-password">
+        <a href="forgot_password.php">Forgot Password?</a>
     </div>
     <button class="btn" type="submit" name="submit">Login</button>
     <div class="signup-link">

@@ -13,15 +13,18 @@ if(isset($_POST['submit'])) {
     $number = $_POST['number'];
     $address = $_POST['street_number'] . ', ' . $_POST['floor_unit'] . ', ' . $_POST['street_name'] . ', ' . $_POST['city'] . ', ' . $_POST['province'] . ', ' . $_POST['postal_code'];
     $pnumber = $_POST['plate_number'];
+    $email = $_POST['email'];
     $route = $_POST['route'];
+    $passenger = 0;
     $passenger_capacity = $_POST['passenger_capacity'];
     $company_name = $_POST['company_name'];
     $jeepicons = ['jeeps2.png','jeeep.png','jeepsv.png','jeepsy.png','jeepsy1.png','jeepsy2.png','jeepsy3.png','jeepsys.png','jeepsy4.png'];
     $jeepicon = $jeepicons[array_rand($jeepicons)];
-        $sql = "INSERT INTO `locate`(`drivername`, `cnumber`, `platenumber`, `route`, `jeepicon`, `address`, `company_name`, `capacity`) VALUES ('$name','$number','$pnumber','$route','$jeepicon','$address','$company_name','$passenger_capacity')";
+        $sql = "INSERT INTO `locate`(`drivername`, `cnumber`, `email`, `platenumber`, `route`, `jeepicon`, `address`, `company_name`, `capacity`, `passenger`) VALUES ('$name','$number', '$email','$pnumber','$route','$jeepicon','$address','$company_name','$passenger_capacity', '$passenger')";
         
     if ($conn->query($sql) === TRUE) {
         $insertSuccess = true;
+        $_SESSION['success_message'] = "Jeepney details have been successfully added!";
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
@@ -268,6 +271,10 @@ if(isset($_POST['submit'])) {
                         <input type="text" name="number" required="required" class="form-control"/>
                     </div>
                     <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="text" name="email" required="required" class="form-control"/>
+                    </div>
+                    <div class="form-group">
                         <label class="form-label">Plate number</label>
                         <input type="text" name="plate_number" required="required" class="form-control"/>
                     </div>
@@ -282,6 +289,11 @@ if(isset($_POST['submit'])) {
                             <option value="Tabaco to Legazpi">Tabaco to Legazpi</option>
                             <option value="Sto.Domingo to Legazpi">Sto.Domingo to Legazpi</option>
                             <option value="Daraga to Legazpi">Daraga to Legazpi</option>
+                            <option value="Baao to Legazpi">Baao to Legazpi</option>
+                            <option value="Manito to Legazpi">Manito to Legazpi</option>
+                            <option value="Iriga to Legazpi">Iriga to Legazpi</option>
+                            <option value="Camalig to Legazpi">Camalig to Legazpi</option>
+
                         </select>
                     </div>
                     <button class="btn" type="submit" name="submit">Submit</button>
@@ -298,13 +310,15 @@ if(isset($_POST['submit'])) {
             });
 
             <?php if ($insertSuccess): ?>
-                swal({
-                    title: "Success",
-                    text: "Congratulations, your account has been successfully created.",
-                    icon: "success",
-                    confirmButtonText: "OK",
-                }).then(function(){
-                    window.location.href = "dashboard.php?id=<?php echo $id ?>";
+                Swal.fire({
+                    title: 'Success!',
+                    text: '<?php echo $_SESSION['success_message']; ?>',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = 'dashboard.php?id=<?php echo $id ?>';
+                    }
                 });
             <?php endif; ?>
         </script>

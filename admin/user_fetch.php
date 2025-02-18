@@ -29,10 +29,10 @@
             echo "
              <td>
                     <div class='action-buttons'>
-                        <a href='edit.php?ids={$row['id']}}&id={$ids}' class='btn-icon edit' title='Edit'>
+                        <a href='edit.php?ids={$row['id']}&id={$ids}' class='btn-icon edit' title='Edit'>
                             <i class='bx bxs-edit'></i>
                         </a>
-                        <a href='delete_user.php?ids={$row['id']}}&id={$ids}' class='btn-icon delete' title='Delete'>
+                        <a href='delete_user.php?ids={$row['id']}&id={$ids}' class='btn-icon delete' title='Delete' onclick='return confirm(\"Are you sure you want to delete this account?\");'>
                             <i class='bx bxs-trash'></i>
                         </a>
                     </div>

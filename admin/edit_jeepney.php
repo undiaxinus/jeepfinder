@@ -16,16 +16,18 @@ if(isset($_POST['submit'])) {
     $number = $conn->real_escape_string($_POST['number']);
     $address = $conn->real_escape_string($_POST['street_number']) . ', ' . $conn->real_escape_string($_POST['floor_unit']) . ', ' . $conn->real_escape_string($_POST['street_name']) . ', ' . $conn->real_escape_string($_POST['city']) . ', ' . $conn->real_escape_string($_POST['province']) . ', ' . $conn->real_escape_string($_POST['postal_code']);
     $pnumber = $conn->real_escape_string($_POST['plate_number']);
+    $email = $conn->real_escape_string($_POST['email']);
     $route = $conn->real_escape_string($_POST['route']);
     $company_name = $conn->real_escape_string($_POST['company_name']);
     $jeepicons = ['jeeps2.png','jeeep.png','jeepsv.png','jeepsy.png','jeepsy1.png','jeepsy2.png','jeepsy3.png','jeepsys.png','jeepsy4.png'];
     $jeepicon = $jeepicons[array_rand($jeepicons)];
     $passenger_capacity = $conn->real_escape_string($_POST['passenger_capacity']);
 
-    $sql = "UPDATE `locate` SET `drivername`='$name', `cnumber`='$number', `platenumber`='$pnumber', `route`='$route', `jeepicon`='$jeepicon', `address`='$address', `company_name`='$company_name', `capacity`='$passenger_capacity' WHERE `ID`='$ids'";
+    $sql = "UPDATE `locate` SET `drivername`='$name', `cnumber`='$number', `email`='$email', `platenumber`='$pnumber', `route`='$route', `jeepicon`='$jeepicon', `address`='$address', `company_name`='$company_name', `capacity`='$passenger_capacity' WHERE `ID`='$ids'";
     
     if ($conn->query($sql) === TRUE) {
         $updateSuccess = true;
+        $_SESSION['success_message'] = "Driver information updated successfully!";
     } else {
         echo "Error updating record: " . $conn->error;
     }
@@ -41,6 +43,7 @@ if (isset($_GET['ids'])) {
         $row = $result->fetch_assoc();
         $name = $row['drivername'];
         $number = $row['cnumber'];
+        $email = $row['email'];
         $address_parts = explode(', ', $row['address']);
         $street_number = $address_parts[0];
         $floor_unit = $address_parts[1] ?? '';
@@ -313,6 +316,10 @@ if (isset($_GET['ids'])) {
                         <input type="text" name="number" required="required" value="<?php echo $number; ?>" class="form-control"/>
                     </div>
                     <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="text" name="email" required="required" value="<?php echo $email; ?>" class="form-control"/>
+                    </div>
+                    <div class="form-group">
                         <label class="form-label">Plate number</label>
                         <input type="text" name="plate_number" required="required" value="<?php echo $pnumber; ?>" class="form-control"/>
                     </div>
@@ -327,6 +334,13 @@ if (isset($_GET['ids'])) {
                             <option <?php if ($route == "Tabaco to Legazpi") echo "selected"; ?>>Tabaco to Legazpi</option>
                             <option <?php if ($route == "Sto.Domingo to Legazpi") echo "selected"; ?>>Sto.Domingo to Legazpi</option>
                             <option <?php if ($route == "Daraga to Legazpi") echo "selected"; ?>>Daraga to Legazpi</option>
+                            <option <?php if ($route == "Tabaco to Legazpi") echo "selected"; ?>>Tabaco to Legazpi</option>
+                            <option <?php if ($route == "Sto.Domingo to Legazpi") echo "selected"; ?>>Sto.Domingo to Legazpi</option>
+                            <option <?php if ($route == "Daraga to Legazpi") echo "selected"; ?>>Daraga to Legazpi</option>
+                            <option <?php if ($route == "Baao to Legazpi") echo "selected"; ?>>Baao to Legazpi</option>
+                            <option <?php if ($route == "Manito to Legazpi") echo "selected"; ?>>Manito to Legazpi</option>
+                            <option <?php if ($route == "Iriga to Legazpi") echo "selected"; ?>>Iriga to Legazpi</option>
+                            <option <?php if ($route == "Camalig to Legazpi") echo "selected"; ?>>Camalig to Legazpi</option>
                         </select>
                     </div>
                 
@@ -337,13 +351,15 @@ if (isset($_GET['ids'])) {
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script type="text/javascript">
             <?php if ($updateSuccess): ?>
-                swal({
-                    title: "Success",
-                    text: "Driver information updated successfully.",
-                    icon: "success",
-                    confirmButtonText: "OK",
-                }).then(function(){
-                    window.location.href = "dashboard.php?id=<?php echo $id ?>";
+                Swal.fire({
+                    title: 'Success!',
+                    text: '<?php echo $_SESSION['success_message']; ?>',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = 'dashboard.php?id=<?php echo $id ?>';
+                    }
                 });
             <?php endif; ?>
         </script>

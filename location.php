@@ -11,7 +11,8 @@ $speed = $_POST['speed'];
 $bearing = $_POST['rotation']; // Assuming the bearing is sent from Arduino
 
 // Update MySQL database
-$sql = "UPDATE locate SET passenger = '$message', latitude = '$latitude', longitude = '$longitude', speed = '$speed', rotation = '$bearing', resdate = NOW()  WHERE ID = '$id'";
+// $sql = "UPDATE locate SET passenger = '$message', latitude = '$latitude', longitude = '$longitude', speed = '$speed', rotation = '$bearing', resdate = NOW()  WHERE ID = '$id'";
+$sql = "UPDATE locate SET passenger = '$message', resdate = NOW()  WHERE ID = '$id'";
 
 if ($conn->query($sql) === TRUE) {
     echo "Record updated successfully";

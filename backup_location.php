@@ -70,9 +70,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             (time() - $_SESSION['otp_time']) <= 600) {
             
             if ($entered_otp == $_SESSION['otp']) {
-                // OTP is valid
+                // OTP is valid - set device as verified in session
+                $_SESSION['device_verified'] = $_SESSION['device_id'];
+                
+                // Clear OTP session variables
                 unset($_SESSION['otp']);
                 unset($_SESSION['otp_time']);
+                unset($_SESSION['device_id']);
                 echo json_encode(['success' => true]);
             } else {
                 echo json_encode(['success' => false, 'message' => 'Invalid OTP']);
@@ -87,25 +91,57 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
 // Check if form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['latitude'])) {
     // Parse incoming data
-    $id = isset($_POST['ID']) ? $_POST['ID'] : '';
+    $device_id = isset($_POST['ID']) ? $_POST['ID'] : '';
     $latitude = isset($_POST['latitude']) ? $_POST['latitude'] : '';
     $longitude = isset($_POST['longitude']) ? $_POST['longitude'] : '';
     $speed = isset($_POST['speed']) ? $_POST['speed'] : '';
     $bearing = isset($_POST['rotation']) ? $_POST['rotation'] : '';
 
-    // Update MySQL database using prepared statement
-    $sql = "UPDATE locate SET latitude = ?, longitude = ?, speed = ?, rotation = ?, resdate = NOW() WHERE ID = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ddddi", $latitude, $longitude, $speed, $bearing, $id);
+    // Check if device is verified in session
+    if (isset($_SESSION['device_verified']) && $_SESSION['device_verified'] === $device_id) {
+        // Update MySQL database using prepared statement
+        $sql = "UPDATE locate SET latitude = ?, longitude = ?, speed = ?, rotation = ?, resdate = NOW() WHERE ID = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ddddi", $latitude, $longitude, $speed, $bearing, $device_id);
 
-    if ($stmt->execute()) {
-        echo "";
-    } else {
-        echo "Error updating record: " . $conn->error;
+        if ($stmt->execute()) {
+            echo "";
+        } else {
+            echo "Error updating record: " . $conn->error;
+        }
+
+        $stmt->close();
+        $conn->close();
     }
+}
 
-    $stmt->close();
-    $conn->close();
+// Add this after the existing POST handlers, before the HTML
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_passenger'])) {
+    $id = $_POST['device_id'];
+    $change = $_POST['change'];
+
+    // First get current passenger count
+    $sql = "SELECT passenger FROM locate WHERE ID = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    
+    // Calculate new passenger count
+    $newCount = max(0, ($row['passenger'] ?? 0) + $change); // Ensure count doesn't go below 0
+    
+    // Update passenger count
+    $sql = "UPDATE locate SET passenger = ? WHERE ID = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $newCount, $id);
+    
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'count' => $newCount]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to update passenger count']);
+    }
+    exit;
 }
 ?>
 <!DOCTYPE html>
@@ -329,6 +365,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['latitude'])) {
             border-color: #555;
             color: #fff;
         }
+
+        .passenger-btn {
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 120px;
+            transition: all 0.3s ease;
+        }
+
+        .passenger-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .passenger-btn:active {
+            transform: translateY(0);
+        }
+
+        .passenger-btn i {
+            margin-right: 8px;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .d-flex.align-items-center.gap-3 {
+                flex-direction: column;
+                align-items: stretch !important;
+            }
+
+            .passenger-btn {
+                padding: 15px 24px;
+                font-size: 1.2rem;
+                width: 100%;
+                margin-top: 8px;
+            }
+
+            #passenger {
+                text-align: center;
+                font-size: 1.2rem;
+                padding: 12px;
+            }
+        }
     </style>
     <link rel="manifest" href="manifest.json">
     <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.css" rel="stylesheet">
@@ -406,6 +487,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['latitude'])) {
                 </div>
 
                 <div class="form-group">
+                    <label for="passenger">
+                        <i class="fas fa-users"></i> Passenger Count
+                    </label>
+                    <div class="d-flex align-items-center gap-3">
+                        <input type="number" class="form-control" id="passenger" name="passenger" 
+                               required placeholder="Current passengers" readonly>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-success passenger-btn" onclick="updatePassengerCount(1)">
+                                <i class="fas fa-plus fa-lg"></i>
+                                <span class="ms-2">Add</span>
+                            </button>
+                            <button type="button" class="btn btn-danger passenger-btn" onclick="updatePassengerCount(-1)">
+                                <i class="fas fa-minus fa-lg"></i>
+                                <span class="ms-2">Remove</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <label for="deviceId">
                         <i class="fas fa-fingerprint"></i> Device ID
                     </label>
@@ -457,7 +558,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['latitude'])) {
 
         document.addEventListener('DOMContentLoaded', function() {
             registerServiceWorker();
-            startTracking();
+            loadInitialPassengerCount();
         });
 
         function startTracking() {
@@ -468,8 +569,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['latitude'])) {
                     maximumAge: 0
                 });
                 
-                // Remove device orientation listener since we'll calculate bearing from movement
-                setInterval(submitForm, 1000);
+                // Update both form and passenger count regularly
+                setInterval(() => {
+                    submitForm();
+                    fetchPassengerCount();
+                }, 1000);
             } else {
                 showCustomAlert("Geolocation is not supported by this browser.");
             }
@@ -533,7 +637,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['latitude'])) {
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.text())
             .catch(error => console.error('Error:', error));
         }
 
@@ -717,6 +820,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['latitude'])) {
                         title: 'Success!',
                         text: 'Device ID verified and saved successfully!',
                         showConfirmButton: true
+                    }).then(() => {
+                        // Start tracking only after successful verification
+                        startTracking();
                     });
                 } else {
                     Swal.fire({
@@ -749,17 +855,120 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['latitude'])) {
 
         // Load saved Device ID on page load
         document.addEventListener('DOMContentLoaded', function() {
-            const savedDeviceId = localStorage.getItem('deviceId');
-            if (savedDeviceId) {
-                document.getElementById('deviceId').value = savedDeviceId;
+            // Only start tracking if device is already verified (from previous session)
+            const deviceId = localStorage.getItem('deviceId');
+            if (deviceId) {
+                document.getElementById('deviceId').value = deviceId;
                 document.getElementById('deviceId').readOnly = true;
+                
+                // Check if device is verified in session before starting tracking
+                fetch('check_verification.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        'device_id': deviceId
+                    }).toString()
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.verified) {
+                        startTracking();
+                    } else {
+                        // If not verified, prompt for verification
+                        saveDeviceId();
+                    }
+                })
+                .catch(error => console.error('Error:', error));
             }
+            
+            loadInitialPassengerCount();
         });
 
         function showCustomAlert(message) {
             const alertModal = new bootstrap.Modal(document.getElementById('customAlert'));
             document.getElementById('alertMessage').textContent = message;
             alertModal.show();
+        }
+
+        function updatePassengerCount(change) {
+            const deviceId = document.getElementById('deviceId').value;
+            if (!deviceId) {
+                showCustomAlert("Please set a Device ID first");
+                return;
+            }
+
+            fetch(window.location.href, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    'update_passenger': true,
+                    'device_id': deviceId,
+                    'change': change
+                }).toString()
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove manual update since it will be updated by the interval
+                    const message = change > 0 ? "Passenger added" : "Passenger removed";
+                    Swal.fire({
+                        icon: 'success',
+                        title: message,
+                        text: `Current passenger count: ${data.count}`,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Failed to update passenger count'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while updating passenger count'
+                });
+            });
+        }
+
+        // Add this to your existing document.addEventListener('DOMContentLoaded', ...) function
+        // This will load the initial passenger count when the page loads
+        function loadInitialPassengerCount() {
+            const deviceId = localStorage.getItem('deviceId');
+            if (deviceId) {
+                fetch(`get_passenger_count.php?device_id=${deviceId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('passenger').value = data.count;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        }
+
+        // Add this function to the JavaScript section
+        function fetchPassengerCount() {
+            const deviceId = document.getElementById('deviceId').value;
+            if (deviceId) {
+                fetch(`get_passenger_count.php?device_id=${deviceId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('passenger').value = data.count;
+                    }
+                })
+                .catch(error => console.error('Error fetching passenger count:', error));
+            }
         }
     </script>
 

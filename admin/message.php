@@ -53,6 +53,21 @@
       $messages[] = $msgRow;
     }
   }
+
+  // Create an array to store contacts with their unread counts
+  $sortedContacts = array();
+
+  // Populate the array with contacts and their unread counts
+  foreach ($contact as $c) {
+    $unreadCount = getUnreadMessageCount($c['user'], $sender_id, $conn);
+    $c['unread_count'] = $unreadCount;
+    $sortedContacts[] = $c;
+  }
+
+  // Sort the array by unread count in descending order
+  usort($sortedContacts, function($a, $b) {
+    return $b['unread_count'] - $a['unread_count'];
+  });
 ?>
 <!DOCTYPE html>
 <html>
@@ -589,17 +604,16 @@
           <div class="card mb-sm-3 mb-md-0 contacts_card">
             <div class="card-body contacts_body">
             <ul class="contacts">
-    <?php foreach ($contact as $c): ?>
+    <?php foreach ($sortedContacts as $c): ?>
         <?php
-            // Listahan ng mga random na larawan
             $images = [
                 "../img/avatar/avatar1.gif",
                 "../img/avatar/avatar2.gif",
                 "../img/avatar/avatar3.gif",
                 "../img/avatar/avatar4.gif"
             ];
-            // Random na pumili ng larawan mula sa listahan
             $randomImage = $images[array_rand($images)];
+            $unreadCount = $c['unread_count'];
         ?>
         <li class="contact-item" 
             data-id="<?php echo $c['id']; ?>" 
@@ -610,7 +624,6 @@
                 <div class="img_cont">
                     <img src="<?php echo !empty($c['profile']) ? '../img/avatar/' . $c['profile'] : '../img/avatar/avatar1.gif'; ?>" class="rounded-circle user_img">
                     <?php
-                $unreadCount = getUnreadMessageCount($c['user'], $sender_id, $conn);
                 if ($c['status'] == "online") {
                     echo '<span class="online_icon">' . $unreadCount . '</span>';
                 } else {

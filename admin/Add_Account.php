@@ -28,6 +28,7 @@ if(isset($_POST['submit'])) {
         $sql = "INSERT INTO `user`(`fname`,`mname`,`lname`, `email`, `user`, `password`, `account`, `status`) VALUES ('$fname', '$mname', '$lname', '$email', '$user', '$hashedPassword', '$account', '$status')";
         if ($conn->query($sql) === TRUE) {
             $insertSuccess = true;
+            $_SESSION['success_message'] = "Account for " . $fname . " " . $lname . " has been successfully created.";
         } else {
             echo "Error: " . $sql . "<br>" . $conn->error;
         }
@@ -51,7 +52,7 @@ if(isset($_POST['submit'])) {
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/osmbuildings@4.0.0/dist/OSMBuildings-Leaflet.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
         <style>
             body {
                 background: rgba(17, 16, 29, 0.95);
@@ -292,7 +293,6 @@ if(isset($_POST['submit'])) {
                 </form>
             </div>
         </section>
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script type="text/javascript">
             $('#password').focusin(function(){
                 $('form').addClass('up')
@@ -300,24 +300,38 @@ if(isset($_POST['submit'])) {
             $('#password').focusout(function(){
                 $('form').removeClass('up')
             });
+            
             <?php if ($emailExists): ?>
-                swal({
-                    title: "Error",
+                Swal.fire({
+                    title: "Error!",
                     text: "Email already exists. Please try another email.",
                     icon: "error",
                     confirmButtonText: "OK",
-                }).then(function() {
-                    window.location.href = "Add_Account.php?id=<?php echo $id ?>";
+                    confirmButtonColor: "#dc3545"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "Add_Account.php?id=<?php echo $id ?>";
+                    }
                 });
             <?php endif; ?>
+            
             <?php if ($insertSuccess): ?>
-                swal({
-                    title: "Success",
-                    text: "Congratulations, your account has been successfully created.",
+                Swal.fire({
+                    title: "Success!",
+                    text: "<?php echo $_SESSION['success_message']; ?>",
                     icon: "success",
                     confirmButtonText: "OK",
-                }).then(function(){
-                    window.location.href = "users.php?id=<?php echo $id ?>";
+                    confirmButtonColor: "#28a745",
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "users.php?id=<?php echo $id ?>";
+                    }
                 });
             <?php endif; ?>
         </script>
@@ -362,11 +376,12 @@ $(document).ready(function() {
 
         if (password !== confirmPassword) {
             e.preventDefault();
-            swal({
-                title: "Error",
+            Swal.fire({
+                title: "Error!",
                 text: "Passwords do not match. Please try again.",
                 icon: "error",
-                button: "OK",
+                confirmButtonText: "OK",
+                confirmButtonColor: "#dc3545"
             });
         }
     });

@@ -56,7 +56,7 @@ if ($result->num_rows > 0) {
                     <a href='edit_jeepney.php?ids={$row['ID']}&id={$ids}' class='btn-icon edit' title='Edit'>
                         <i class='bx bxs-edit'></i>
                     </a>
-                    <a href='delete_jeepney.php?ids={$row['ID']}&id={$ids}' class='btn-icon delete' title='Delete'>
+                    <a href='delete_jeepney.php?ids={$row['ID']}&id={$ids}' class='btn-icon delete' title='Delete' onclick='return confirm(\"Are you sure you want to delete this account?\");'>
                         <i class='bx bxs-trash'></i>
                     </a>
                 </div>

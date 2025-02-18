@@ -937,7 +937,7 @@ $conn->close();
 
         var baseLayers = {
             "Basic View": osmLayer,
-            "Satellite View": stadiaLayer,
+            //"Satellite View": stadiaLayer,
             "Dark View": Stadia_AlidadeSmoothDark, 
         };
         L.control.layers(baseLayers).addTo(map);
